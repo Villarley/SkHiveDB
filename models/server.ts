@@ -1,5 +1,5 @@
 import express, {Application} from 'express';
-// import userRoutes from '../routes/usuario';
+import userRoutes from '../routes/person.routes';
 import cors from 'cors';
 import db from '../db/connection';
 
@@ -42,7 +42,7 @@ class Server{
 
     routes(){
 
-        // this.app.use( this.apiPaths.person, userRoutes );
+        this.app.use( this.apiPaths.person, userRoutes );
     }
 
     listen(){
