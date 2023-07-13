@@ -1,5 +1,6 @@
 import express, {Application} from 'express';
 import userRoutes from '../routes/person.routes';
+import  auth  from "../routes/auth.routes";
 import cors from 'cors';
 import db from '../db/connection';
 
@@ -7,7 +8,8 @@ class Server{
     private app: Application;
     private port: string;
     private apiPaths = {
-        profesor: '/api/profesor/',
+        profesor: '/api/professor/',
+        authPath: '/api/auth/',
         student: '/api/student/',
         person: '/api/person/'
     }
@@ -22,8 +24,9 @@ class Server{
 
     async dbConnection(){
         try{
-
+            //verify connection
             await db.authenticate();
+            //sync the models
             await db.sync();
             console.log('DB online')
         }catch(error){
@@ -42,6 +45,7 @@ class Server{
 
     routes(){
 
+        this.app.use( this.apiPaths.authPath, auth );
         this.app.use( this.apiPaths.person, userRoutes );
     }
 

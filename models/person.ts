@@ -1,3 +1,4 @@
+// person.ts
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../db/connection';
 
@@ -6,6 +7,9 @@ class Person extends Model {
   public name!: string;
   public surnames!: string;
   public password!: string;
+  public state!: boolean; // Agrega el campo de state
+
+  // ...
 }
 
 Person.init(
@@ -25,6 +29,10 @@ Person.init(
     password: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    state: {
+      type: DataTypes.BOOLEAN, // Ajusta el tipo según el tipo de datos de tu base de datos
+      defaultValue: true, // Valor por defecto para el state
     },
   },
   {
