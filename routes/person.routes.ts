@@ -16,7 +16,6 @@ router.get("/:id", validateJWT, getPerson);
 router.get("/", validateJWT, getPersons);
 
 router.post("/", [
-  validateJWT,
   check('email', 'El correo no es válido').isEmail(),
   check('name', 'El nombre es requerido').notEmpty(),
   check('surnames', 'Los apellidos son requeridos').notEmpty(),

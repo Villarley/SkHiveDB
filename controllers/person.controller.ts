@@ -1,3 +1,4 @@
+// controller.ts
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import Person from '../models/person';
@@ -5,7 +6,7 @@ import Student from '../models/student';
 import Professor from '../models/professor';
 
 // Obtener una persona por su ID
-export const getPerson = async (req: Request, res: Response) => {
+export const getPerson = async (req: Request, res: Response, data:any) => {
   try {
     const { id } = req.params;
     const person = await Person.findByPk(id);
@@ -35,13 +36,13 @@ export const getPersons = async (req: Request, res: Response) => {
 // Crear una nueva persona
 export const postPerson = async (req: Request, res: Response) => {
   try {
-    const { email, name, surnames, password, role } = req.body;
+    const { email, name, surnames, password, role, google } = req.body;
 
     // Encriptar la contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Crear la persona
-    const newPerson = await Person.create({ email, name, surnames, password: hashedPassword, state: true });
+    const newPerson = await Person.create({ email, name, surnames, password: hashedPassword, state: true, google });
 
     // Verificar si se debe crear un estudiante o un profesor
     let newRole;
@@ -51,7 +52,9 @@ export const postPerson = async (req: Request, res: Response) => {
       newRole = await Professor.create({ email });
     }
 
-    res.status(201).json({ person: newPerson, role: newRole });
+    res.status(201).json({ person: newPerson,
+    msg: "Perfil creado correctamente"
+    });
   } catch (error) {
     console.error('Error al crear la persona:', error);
     res.status(500).json({ error: 'Error al crear la persona' });
@@ -62,7 +65,7 @@ export const postPerson = async (req: Request, res: Response) => {
 export const putPerson = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { email, name, surnames, password, state } = req.body;
+    const { email, name, surnames, password, state, google } = req.body;
     const person = await Person.findByPk(id);
 
     if (!person) {
@@ -79,6 +82,7 @@ export const putPerson = async (req: Request, res: Response) => {
     }
 
     person.state = state;
+    person.google = google;
     await person.save();
 
     res.json(person);
@@ -120,7 +124,7 @@ export const deactivatePerson = async (req: Request, res: Response) => {
     person.state = false;
     await person.save();
 
-    res.json({person});
+    res.json({ person });
   } catch (error) {
     console.error('Error al desactivar la persona:', error);
     res.status(500).json({ error: 'Error al desactivar la persona' });

@@ -7,7 +7,8 @@ class Person extends Model {
   public name!: string;
   public surnames!: string;
   public password!: string;
-  public state!: boolean; // Agrega el campo de state
+  public state!: boolean;
+  public google!: boolean; // Agrega el campo de google
 
   // ...
 }
@@ -30,9 +31,13 @@ Person.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    google: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false, // Valor por defecto para google (no es de Google)
+    },
     state: {
-      type: DataTypes.BOOLEAN, // Ajusta el tipo según el tipo de datos de tu base de datos
-      defaultValue: true, // Valor por defecto para el state
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
     },
   },
   {
