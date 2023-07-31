@@ -27,7 +27,7 @@ class Server{
             //verify connection
             await db.authenticate();
             //sync the models
-            await db.sync();
+            await db.sync({force: true});
             console.log('DB online')
         }catch(error){
             throw error;

@@ -1,10 +1,15 @@
+//dependencies
 import { Request, Response } from 'express';
-import Person from '../models/person';
 import bcryptjs from "bcrypt";
+//models:
+import Person from '../models/person';
+import Professor from '../models/professor';
+import Student from '../models/student';
+//models;
+//My functions
 import { generateJWT } from '../helpers/generatorJWT';
 import { googleVerify } from '../helpers/google-verify';
-import Student from '../models/student';
-import Professor from '../models/professor';
+import { sendEmail } from '../utils/sendEmail';
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -46,7 +51,6 @@ export const googleSignUp = async (req: Request, res: Response) => {
   const { id_token, role } = req.body;
   try {
     const { name, family_name, email } = await googleVerify(id_token);
-
     let person = await Person.findByPk(email);
 
     
@@ -73,7 +77,12 @@ export const googleSignUp = async (req: Request, res: Response) => {
       }
       
       const token = await generateJWT(newPerson.email);
-      
+      const dataEmail = {
+        email: newPerson.email||'',
+        name: newPerson.name||'',
+        surnames: family_name||''
+      }
+      sendEmail(dataEmail, "Welcome");
       res.json({
         newPerson,
         token
@@ -83,7 +92,7 @@ export const googleSignUp = async (req: Request, res: Response) => {
       const token = await generateJWT(person.email);
 
       res.json({
-        msg: 'account already exists',
+        msg: 'La cuenta ya existe',
         person,
         token
       });

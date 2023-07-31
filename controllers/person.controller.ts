@@ -1,24 +1,25 @@
-// controller.ts
-import { Request, Response } from 'express';
-import bcrypt from 'bcrypt';
-import Person from '../models/person';
-import Student from '../models/student';
-import Professor from '../models/professor';
+//
+import { Request, Response } from "express";
+import bcrypt from "bcrypt";
+import Person from "../models/person";
+import Student from "../models/student";
+import Professor from "../models/professor";
+import { sendEmail } from "../utils/sendEmail";
 
 // Obtener una persona por su ID
-export const getPerson = async (req: Request, res: Response, data:any) => {
+export const getPerson = async (req: Request, res: Response, data: any) => {
   try {
     const { id } = req.params;
     const person = await Person.findByPk(id);
 
     if (!person) {
-      return res.status(404).json({ error: 'Persona no encontrada' });
+      return res.status(404).json({ error: "Persona no encontrada" });
     }
 
     res.json(person);
   } catch (error) {
-    console.error('Error al obtener la persona:', error);
-    res.status(500).json({ error: 'Error al obtener la persona' });
+    console.error("Error al obtener la persona:", error);
+    res.status(500).json({ error: "Error al obtener la persona" });
   }
 };
 
@@ -28,8 +29,8 @@ export const getPersons = async (req: Request, res: Response) => {
     const persons = await Person.findAll();
     res.json(persons);
   } catch (error) {
-    console.error('Error al obtener las personas:', error);
-    res.status(500).json({ error: 'Error al obtener las personas' });
+    console.error("Error al obtener las personas:", error);
+    res.status(500).json({ error: "Error al obtener las personas" });
   }
 };
 
@@ -42,22 +43,33 @@ export const postPerson = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Crear la persona
-    const newPerson = await Person.create({ email, name, surnames, password: hashedPassword, state: true, google });
+    const newPerson = await Person.create({
+      email,
+      name,
+      surnames,
+      password: hashedPassword,
+      state: true,
+      google,
+    });
 
     // Verificar si se debe crear un estudiante o un profesor
     let newRole;
-    if (role === 'student') {
+    if (role === "student") {
       newRole = await Student.create({ email });
-    } else if (role === 'professor') {
+    } else if (role === "professor") {
       newRole = await Professor.create({ email });
     }
-
-    res.status(201).json({ person: newPerson,
-    msg: "Perfil creado correctamente"
-    });
+    // const dataEmail = {
+    //   email: newPerson.email||'',
+    //   name: newPerson.name||'',
+    // }
+    // sendEmail(dataEmail, "Welcome");
+    res
+      .status(201)
+      .json({ person: newPerson, msg: "Perfil creado correctamente" });
   } catch (error) {
-    console.error('Error al crear la persona:', error);
-    res.status(500).json({ error: 'Error al crear la persona' });
+    console.error("Error al crear la persona:", error);
+    res.status(500).json({ error: "Error al crear la persona" });
   }
 };
 
@@ -69,7 +81,7 @@ export const putPerson = async (req: Request, res: Response) => {
     const person = await Person.findByPk(id);
 
     if (!person) {
-      return res.status(404).json({ error: 'Persona no encontrada' });
+      return res.status(404).json({ error: "Persona no encontrada" });
     }
 
     person.email = email;
@@ -87,8 +99,8 @@ export const putPerson = async (req: Request, res: Response) => {
 
     res.json(person);
   } catch (error) {
-    console.error('Error al actualizar la persona:', error);
-    res.status(500).json({ error: 'Error al actualizar la persona' });
+    console.error("Error al actualizar la persona:", error);
+    res.status(500).json({ error: "Error al actualizar la persona" });
   }
 };
 
@@ -99,15 +111,15 @@ export const deletePerson = async (req: Request, res: Response) => {
     const person = await Person.findByPk(id);
 
     if (!person) {
-      return res.status(404).json({ error: 'Persona no encontrada' });
+      return res.status(404).json({ error: "Persona no encontrada" });
     }
 
     await person.destroy();
 
-    res.json({ message: 'Persona eliminada correctamente' });
+    res.json({ message: "Persona eliminada correctamente" });
   } catch (error) {
-    console.error('Error al eliminar la persona:', error);
-    res.status(500).json({ error: 'Error al eliminar la persona' });
+    console.error("Error al eliminar la persona:", error);
+    res.status(500).json({ error: "Error al eliminar la persona" });
   }
 };
 
@@ -118,7 +130,7 @@ export const deactivatePerson = async (req: Request, res: Response) => {
     const person = await Person.findByPk(id);
 
     if (!person) {
-      return res.status(404).json({ error: 'Persona no encontrada' });
+      return res.status(404).json({ error: "Persona no encontrada" });
     }
 
     person.state = false;
@@ -126,7 +138,7 @@ export const deactivatePerson = async (req: Request, res: Response) => {
 
     res.json({ person });
   } catch (error) {
-    console.error('Error al desactivar la persona:', error);
-    res.status(500).json({ error: 'Error al desactivar la persona' });
+    console.error("Error al desactivar la persona:", error);
+    res.status(500).json({ error: "Error al desactivar la persona" });
   }
 };
