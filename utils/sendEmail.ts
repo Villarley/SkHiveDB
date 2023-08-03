@@ -1,4 +1,5 @@
 import nodeMailer from "nodemailer";
+import { capitalizeNameAndSurnames } from "./capitalizeNameAndSurnames";
 interface EmailData {
     email: string;
     name: string;
@@ -19,6 +20,7 @@ export const sendEmail = async (data: EmailData, messageContent: string) => {
       },
     });
     //message obj
+    const formattedName = capitalizeNameAndSurnames(name);
     const message = {
       to: email,
       subject: messageContent+" to Skhive",
@@ -27,7 +29,7 @@ export const sendEmail = async (data: EmailData, messageContent: string) => {
               <tr>
                 <td style="padding: 20px;">                
                   <h1 style="color: #6F3BFF;">¡Bienvenido a Skhive!</h1>
-                  <p style="color: #333; font-size: 16px; line-height: 1.6;">Estimado , ${name}</p>
+                  <p style="color: #333; font-size: 16px; line-height: 1.6;">Estimado , ${formattedName}</p>
                   <p style="color: #333; font-size: 16px; line-height: 1.6;">Gracias por unirte a Skhive, la plataforma líder en habilidades blandas.</p>
                   <p style="color: #333; font-size: 16px; line-height: 1.6;">Esperamos que disfrutes de todas las características y beneficios que tenemos para ofrecerte.</p>
                   <p style="color: #333; font-size: 16px; line-height: 1.6;">¡Gracias por ser parte de la comunidad Skhive!</p>

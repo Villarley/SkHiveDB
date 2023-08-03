@@ -1,7 +1,9 @@
 import express, {Application} from 'express';
+import cors from 'cors';
+//Routes:
+import classRoutes from "../routes/class.routes"
 import userRoutes from '../routes/person.routes';
 import  auth  from "../routes/auth.routes";
-import cors from 'cors';
 import db from '../db/connection';
 
 class Server{
@@ -11,7 +13,8 @@ class Server{
         profesor: '/api/professor/',
         authPath: '/api/auth/',
         student: '/api/student/',
-        person: '/api/person/'
+        person: '/api/person/',
+        classes:'/api/classes/',
     }
     constructor(){
         this.app = express();
@@ -47,6 +50,8 @@ class Server{
 
         this.app.use( this.apiPaths.authPath, auth );
         this.app.use( this.apiPaths.person, userRoutes );
+        this.app.use( this.apiPaths.classes, classRoutes ); 
+
     }
 
     listen(){
