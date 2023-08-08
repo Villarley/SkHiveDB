@@ -9,6 +9,8 @@ import {
   getClasses,
   getClassById,
   addStudentToClass,
+  getStudentsInClass,
+  getClassesByProfessor,
 } from "../controllers/class.controller"; // Suponemos que tienes los controladores para las diferentes operaciones
 
 const router = Router();
@@ -46,8 +48,10 @@ router.delete("/classes/:id", deleteClass);
 
 
 // Ruta para agregar un estudiante a una clase
-router.post("/classes/:id/add-student", addStudentToClass);
+router.post("/classes/add-student", addStudentToClass);
 
 // Otras rutas relacionadas con las clases, si es necesario
+router.get("/classes/students/:code", getStudentsInClass);
+router.get("/classes/professor/:email", getClassesByProfessor);
 
 export default router;

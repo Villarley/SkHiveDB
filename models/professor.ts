@@ -1,7 +1,11 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../db/connection';
-import Person from './person';
+import { DataTypes, Model } from "sequelize";
+import sequelize from "../db/connection";
+import Class from "./Classroom/class"; // Asegúrate de importar correctamente la clase Class
+import ProfessorClass from "./Classroom/professor_class"; // Asegúrate de importar correctamente la clase ProfessorClass
+import Person from "./person";
+import { configureAssociations } from "./Classroom/associations";
 
+configureAssociations();
 class Professor extends Model {
   public email!: string;
 }
@@ -25,4 +29,9 @@ Professor.init(
   }
 );
 
+// Configura la asociación con Class a través de ProfessorClass
+// Professor.belongsToMany(Class, {
+//   through: ProfessorClass,
+//   foreignKey: "ProfessorEmail", // Esta es la clave foránea en la tabla ProfessorClass
+// });
 export default Professor;

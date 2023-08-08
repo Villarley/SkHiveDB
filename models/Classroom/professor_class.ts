@@ -1,9 +1,10 @@
-// professor_class.ts
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../db/connection";
-import Professor from "../professor";
-import Class from "./class";
+import Professor from "../professor"; // Asegúrate de importar correctamente la clase Professor
+import Class from "./class"; // Asegúrate de importar correctamente la clase Class
+import { configureAssociations } from "./associations";
 
+configureAssociations();
 class ProfessorClass extends Model {
   public ProfessorEmail!: string;
   public ClassId!: number;
@@ -35,5 +36,4 @@ ProfessorClass.init(
     timestamps: false,
   }
 );
-
 export default ProfessorClass;

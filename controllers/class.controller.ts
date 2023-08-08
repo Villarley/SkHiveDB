@@ -1,8 +1,11 @@
 // classController.ts
 import { Request, Response } from "express";
+import { Op } from "sequelize"; // Op is an operator of sequelize
+//My models
 import Class from "../models/Classroom/class";
 import ProfessorClass from "../models/Classroom/professor_class";
 import StudentClass from "../models/Classroom/student_class";
+import { generateRandomCode } from "../utils/generateCode";
 
 // Controller to get all classes
 export const getClasses = async (req: Request, res: Response) => {
@@ -52,17 +55,36 @@ export const createClass = async (req: Request, res: Response) => {
 
   try {
     // Create a new entry in the "classes" table using the Class model
+    let newCode;
+    let isCodeUnique = false;
+    
+    // Genera un nuevo código aleatorio y verifica su unicidad en la base de datos
+    while (!isCodeUnique) {
+      newCode = generateRandomCode();
+      const existingClass = await Class.findOne({
+        where: {
+          code: {
+            [Op.iLike]: newCode, // Usa iLike para hacer la comparación no case-sensitive
+          },
+        },
+      });
+      
+      if (!existingClass) {
+        isCodeUnique = true;
+      }
+    }
+    //creating the class
     const newClass = await Class.create({
       name,
+      code:newCode
     });
-
     // Associate the professor who created the class with it
     const professorEmail = email; // We assume that the professor is authenticated, and their information is available in req.user
     await ProfessorClass.create({
       ProfessorEmail: professorEmail,
       ClassId: newClass.id,
     });
-
+    
     res.json(newClass);
   } catch (error) {
     console.error("Error creating the class:", error);
@@ -123,12 +145,18 @@ export const deleteClass = async (req: Request, res: Response) => {
 
 // Controller to add a student to a class
 export const addStudentToClass = async (req: Request, res: Response) => {
-  const classId = parseInt(req.params.id);
-  const { studentEmail } = req.body;
+  const { studentEmail, classCode } = req.body; // Eliminamos 'classId' ya que usaremos 'classCode'
 
   try {
-    // Check if the class exists
-    const classFound = await Class.findByPk(classId);
+    // Check if the class exists using the provided class code
+    const classFound = await Class.findOne({
+      where: {
+        code: {
+          [Op.iLike]: classCode,
+        },
+      },
+    });
+
     if (!classFound) {
       res.status(404).json({ message: "Class not found" });
       return;
@@ -146,6 +174,59 @@ export const addStudentToClass = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error adding the student to the class" });
   }
 };
+export const getStudentsInClass = async (req: Request, res: Response) => {
+  const classCode = req.params.code; // Cambia 'id' a 'code' en la ruta
 
+  try {
+    // Busca la clase utilizando el código proporcionado
+    const classFound = await Class.findOne({
+      where: {
+        code: {
+          [Op.iLike]: classCode,
+        },
+      },
+    });
+
+    if (!classFound) {
+      res.status(404).json({ message: "Class not found" });
+      return;
+    }
+
+    // Busca todos los estudiantes asociados a la clase encontrada
+    const students = await StudentClass.findAll({
+      where: {
+        ClassId: classFound.id,
+      },
+    });
+
+    res.json(students);
+  } catch (error) {
+    console.error("Error getting students in the class:", error);
+    res.status(500).json({ message: "Error getting students in the class" });
+  }
+};
+export const getClassesByProfessor = async (req: Request, res: Response) => {
+  const professorEmail = req.params.email; // Cambia 'id' a 'email' en la ruta
+
+  try {
+    // Busca todas las clases asociadas al profesor
+    const classes = await ProfessorClass.findAll({
+      where: {
+        ProfessorEmail: professorEmail,
+      },
+      include: {
+        model: Class,
+        through: {
+          attributes: [], // Esto evita que se incluyan atributos adicionales de la tabla intermedia
+        },
+      },
+    });
+
+    res.json(classes);
+  } catch (error) {
+    console.error("Error getting classes by professor:", error);
+    res.status(500).json({ message: "Error getting classes by professor" });
+  }
+};
 // Other functions/controllers related to classes
 // ...
