@@ -4,7 +4,6 @@ import ProfessorClass from "./professor_class";
 import Professor from "../professor";
 import { configureAssociations } from "./associations";
 
-configureAssociations();
 class Class extends Model {
   public id!: number;
   public name!: string;
@@ -33,11 +32,13 @@ Class.init(
     tableName: 'class',
     timestamps: false,
   }
-);
-
+  );
+  // configureAssociations();
+  
 // Configura la asociación con Professor a través de ProfessorClass
 // Class.belongsToMany(Professor, {
-//   through: ProfessorClass,
-//   foreignKey: "ClassId", // Esta es la clave foránea en la tabla ProfessorClass
-// });
-export default Class;
+  //   through: ProfessorClass,
+  //   foreignKey: "ClassId", // Esta es la clave foránea en la tabla ProfessorClass
+  // });
+  export default Class;
+  

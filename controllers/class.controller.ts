@@ -210,17 +210,20 @@ export const getClassesByProfessor = async (req: Request, res: Response) => {
 
   try {
     // Busca todas las clases asociadas al profesor
-    const classes = await ProfessorClass.findAll({
+    const professorClasses = await ProfessorClass.findAll({
       where: {
         ProfessorEmail: professorEmail,
-      },
-      include: {
-        model: Class,
-        through: {
-          attributes: [], // Esto evita que se incluyan atributos adicionales de la tabla intermedia
-        },
-      },
+      }
     });
+        // Obtiene los IDs de las clases asociadas
+        const classIds = professorClasses.map(item => item.ClassId);
+
+        // Busca los detalles de las clases basados en los IDs
+        const classes = await Class.findAll({
+          where: {
+            id: classIds,
+          }
+        });
 
     res.json(classes);
   } catch (error) {

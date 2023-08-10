@@ -5,7 +5,7 @@ import ProfessorClass from "./Classroom/professor_class"; // Asegúrate de impor
 import Person from "./person";
 import { configureAssociations } from "./Classroom/associations";
 
-configureAssociations();
+// configureAssociations();
 class Professor extends Model {
   public email!: string;
 }
