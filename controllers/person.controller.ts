@@ -56,7 +56,7 @@ export const postPerson = async (req: Request, res: Response) => {
     let newRole;
     if (role === "student") {
       newRole = await Student.create({ email });
-    } else if (role === "professor") {
+    } else if (role === "professor" || role ===undefined || role ===null  ) {
       newRole = await Professor.create({ email });
     }
     // const dataEmail = {

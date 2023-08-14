@@ -30,7 +30,7 @@ Class.init(
     sequelize,
     modelName: 'Class',
     tableName: 'class',
-    timestamps: false,
+    timestamps: true,
   }
   );
   // configureAssociations();

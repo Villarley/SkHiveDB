@@ -1,10 +1,11 @@
 // classController.ts
 import { Request, Response } from "express";
-import { Op } from "sequelize"; // Op is an operator of sequelize
-//My models
+import { Op } from "sequelize"; // Op is an operator of Sequelize
+// My models
 import Class from "../models/Classroom/class";
 import ProfessorClass from "../models/Classroom/professor_class";
 import StudentClass from "../models/Classroom/student_class";
+//Util functions
 import { generateRandomCode } from "../utils/generateCode";
 
 // Controller to get all classes
@@ -57,26 +58,26 @@ export const createClass = async (req: Request, res: Response) => {
     // Create a new entry in the "classes" table using the Class model
     let newCode;
     let isCodeUnique = false;
-    
-    // Genera un nuevo código aleatorio y verifica su unicidad en la base de datos
+
+    // Generate a new random code and check its uniqueness in the database
     while (!isCodeUnique) {
       newCode = generateRandomCode();
       const existingClass = await Class.findOne({
         where: {
           code: {
-            [Op.iLike]: newCode, // Usa iLike para hacer la comparación no case-sensitive
+            [Op.iLike]: newCode,
           },
         },
       });
-      
+
       if (!existingClass) {
         isCodeUnique = true;
       }
     }
-    //creating the class
+    // Create the class
     const newClass = await Class.create({
       name,
-      code:newCode
+      code: newCode,
     });
     // Associate the professor who created the class with it
     const professorEmail = email; // We assume that the professor is authenticated, and their information is available in req.user
@@ -84,7 +85,7 @@ export const createClass = async (req: Request, res: Response) => {
       ProfessorEmail: professorEmail,
       ClassId: newClass.id,
     });
-    
+
     res.json(newClass);
   } catch (error) {
     console.error("Error creating the class:", error);
@@ -140,12 +141,9 @@ export const deleteClass = async (req: Request, res: Response) => {
   }
 };
 
-// Controller to associate a professor with a class
-// This function is no longer necessary as we have included the logic to associate the professor with the class at the time of class creation.
-
-// Controller to add a student to a class
+// Controller to associate a student with a class
 export const addStudentToClass = async (req: Request, res: Response) => {
-  const { studentEmail, classCode } = req.body; // Eliminamos 'classId' ya que usaremos 'classCode'
+  const { studentEmail, classCode } = req.body; // Remove 'classId' as we'll use 'classCode'
 
   try {
     // Check if the class exists using the provided class code
@@ -174,11 +172,16 @@ export const addStudentToClass = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error adding the student to the class" });
   }
 };
+
+// Other functions/controllers related to classes
+// ...
+
+// Controller to get students in a class
 export const getStudentsInClass = async (req: Request, res: Response) => {
-  const classCode = req.params.code; // Cambia 'id' a 'code' en la ruta
+  const classCode = req.params.code; // Change 'id' to 'code' in the route
 
   try {
-    // Busca la clase utilizando el código proporcionado
+    // Find the class using the provided code
     const classFound = await Class.findOne({
       where: {
         code: {
@@ -192,7 +195,7 @@ export const getStudentsInClass = async (req: Request, res: Response) => {
       return;
     }
 
-    // Busca todos los estudiantes asociados a la clase encontrada
+    // Find all students associated with the found class
     const students = await StudentClass.findAll({
       where: {
         ClassId: classFound.id,
@@ -205,25 +208,30 @@ export const getStudentsInClass = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error getting students in the class" });
   }
 };
+
+// Controller to get classes by a professor's email
 export const getClassesByProfessor = async (req: Request, res: Response) => {
-  const professorEmail = req.params.email; // Cambia 'id' a 'email' en la ruta
+  const professorEmail = req.params.email; // Change 'id' to 'email' in the route
 
   try {
-    // Busca todas las clases asociadas al profesor
+    // Find all classes associated with the professor
     const professorClasses = await ProfessorClass.findAll({
       where: {
         ProfessorEmail: professorEmail,
-      }
+      },
     });
-        // Obtiene los IDs de las clases asociadas
-        const classIds = professorClasses.map(item => item.ClassId);
 
-        // Busca los detalles de las clases basados en los IDs
-        const classes = await Class.findAll({
-          where: {
-            id: classIds,
-          }
-        });
+    // Get the IDs of the associated classes
+    const classIds = professorClasses.map(item => item.ClassId);
+
+    // Find class details based on the IDs
+    const classes = await Class.findAll({
+      where: {
+        id: classIds,
+      },
+      //sorting by last edited
+      order: [['updatedAt', 'DESC']],
+    });
 
     res.json(classes);
   } catch (error) {
@@ -231,5 +239,3 @@ export const getClassesByProfessor = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error getting classes by professor" });
   }
 };
-// Other functions/controllers related to classes
-// ...

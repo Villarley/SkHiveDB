@@ -11,47 +11,47 @@ import {
   addStudentToClass,
   getStudentsInClass,
   getClassesByProfessor,
-} from "../controllers/class.controller"; // Suponemos que tienes los controladores para las diferentes operaciones
+} from "../controllers/class.controller"; // Functions
 
 const router = Router();
 
-// Ruta para obtener todas las clases
-router.get("/classes", getClasses);
+// get All classes
+router.get("/", getClasses);
 
-// Ruta para obtener detalles de una clase por su ID
-router.get("/classes/:id", getClassById);
+// Obtain class by id
+router.get("/:id", getClassById);
 
-// Ruta para crear una nueva clase
+// Create a class
 router.post(
-  "/classes",
+  "/",
   [
     check("name", "El nombre de la clase es requerido").notEmpty(),
-    // Otras validaciones según tus requerimientos
+    // Validations
   ],
   validateField,
   createClass
 );
 
-// Ruta para modificar una clase existente por su ID
+// 
 router.put(
-  "/classes/:id",
+  "/:id",
   [
     check("name", "El nombre de la clase es requerido").notEmpty(),
-    // Otras validaciones según tus requerimientos
+    // Validations
   ],
   validateField,
   updateClass
 );
 
-// Ruta para eliminar una clase por su ID
-router.delete("/classes/:id", deleteClass);
+// Eliminating Class
+router.delete("/:id", deleteClass);
 
+// Adding a student to a class
+router.post("/add-student", addStudentToClass);
 
-// Ruta para agregar un estudiante a una clase
-router.post("/classes/add-student", addStudentToClass);
-
-// Otras rutas relacionadas con las clases, si es necesario
-router.get("/classes/students/:code", getStudentsInClass);
-router.get("/classes/professor/:email", getClassesByProfessor);
+// Getting all the students by class 
+router.get("/students/:code", getStudentsInClass);
+// Getting all the classes that remains to a professor
+router.get("/professor/:email", getClassesByProfessor);
 
 export default router;

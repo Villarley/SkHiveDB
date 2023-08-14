@@ -3,7 +3,8 @@ import cors from 'cors';
 //Routes:
 import classRoutes from "../routes/class.routes"
 import userRoutes from '../routes/person.routes';
-import  auth  from "../routes/auth.routes";
+import  authRoutes  from "../routes/auth.routes";
+import activyRoutes from "../routes/activities.routes";
 import db from '../db/connection';
 
 class Server{
@@ -15,6 +16,7 @@ class Server{
         student: '/api/student/',
         person: '/api/person/',
         classes:'/api/classes/',
+        activities:'/api/activities/',
     }
     constructor(){
         this.app = express();
@@ -30,7 +32,7 @@ class Server{
             //verify connection
             await db.authenticate();
             //sync the models
-            await db.sync();
+            await db.sync({force: true});
             console.log('DB online')
         }catch(error){
             throw error;
@@ -48,9 +50,10 @@ class Server{
 
     routes(){
 
-        this.app.use( this.apiPaths.authPath, auth );
+        this.app.use( this.apiPaths.authPath, authRoutes );
         this.app.use( this.apiPaths.person, userRoutes );
         this.app.use( this.apiPaths.classes, classRoutes ); 
+        this.app.use( this.apiPaths.activities, activyRoutes ); 
 
     }
 
