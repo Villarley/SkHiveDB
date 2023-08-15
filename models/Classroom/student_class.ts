@@ -22,6 +22,7 @@ StudentClass.init(
     ClassId: {
       type: DataTypes.INTEGER,
       primaryKey: true,
+      unique: true, // Add this line to define a unique constraint
       references: {
         model: Class,
         key: 'id',

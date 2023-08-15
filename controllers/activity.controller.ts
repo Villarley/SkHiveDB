@@ -3,7 +3,7 @@ import Activity from "../models/Classroom/Activity"; // Adjust the path to the A
 import ActivityClass from "../models/Classroom/ActivityClass"; // Import your ActivityClass model
 import ActivityStudent from "../models/Classroom/ActivityStudent";
 import StudentClass from "../models/Classroom/student_class";
-import sequelize from "sequelize/types/sequelize";
+import sequelize from '../db/connection';
 // Create a new activity
 export const createActivity = async (req: Request, res: Response) => {
   try {
@@ -119,32 +119,51 @@ export const getActivityById = async (req: Request, res: Response) => {
   }
 };
 export const createActivityWithAssignment = async (req: Request, res: Response) => {
-  const { name, description, Skills, Time, DateToComplete, classId } = req.body;
+  const { id, name, description, Skills, Time, DateToComplete, classId } = req.body;
 
   const transaction = await sequelize.transaction(); // Start a transaction
 
   try {
-    // Create a new activity
-    const newActivity = await Activity.create(
-      {
-        name,
-        description,
-        Skills,
-        Time,
-        DateToComplete,
-      },
-      { transaction } // Specify the transaction
-    );
+    let existingActivity:any;
 
-    // Create ActivityClass entry to associate the activity with the class
-    await ActivityClass.create(
-      {
-        ActivityId: newActivity.id,
+    // Check if the user already has an existing activity
+    if (id) {
+      existingActivity = await Activity.findByPk(id);
+    }
+
+    if (!existingActivity) {
+      // If no existing activity, create a new one
+      existingActivity = await Activity.create(
+        {
+          name,
+          description,
+          Skills,
+          Time,
+          DateToComplete,
+        },
+        { transaction } // Specify the transaction
+      );
+    }
+
+    // Check if the existing activity is already assigned to the class
+    const isAssigned = await ActivityClass.findOne({
+      where: {
+        ActivityId: existingActivity.id,
         ClassId: classId,
-        DateToComplete,
       },
-      { transaction } // Specify the transaction
-    );
+    });
+
+    if (!isAssigned) {
+      // If the activity is not assigned to the class, create an ActivityClass entry
+      await ActivityClass.create(
+        {
+          ActivityId: existingActivity.id,
+          ClassId: classId,
+          DateToComplete,
+        },
+        { transaction } // Specify the transaction
+      );
+    }
 
     // Fetch students in the class from StudentClass
     const studentsInClass = await StudentClass.findAll({
@@ -157,7 +176,7 @@ export const createActivityWithAssignment = async (req: Request, res: Response) 
     const studentActivityPromises = studentsInClass.map(async (student) => {
       await ActivityStudent.create(
         {
-          ActivityId: newActivity.id,
+          ActivityId: existingActivity.id,
           StudentEmail: student.StudentEmail,
         },
         { transaction } // Specify the transaction
@@ -169,7 +188,7 @@ export const createActivityWithAssignment = async (req: Request, res: Response) 
 
     await transaction.commit(); // Commit the transaction
 
-    res.status(201).json(newActivity);
+    res.status(201).json(existingActivity);
   } catch (error) {
     await transaction.rollback(); // Rollback the transaction on error
     console.error(error);

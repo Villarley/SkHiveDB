@@ -7,8 +7,8 @@ import {
   deleteActivity,
   getActivities,
   getActivityById,
-  // Add other controller functions as needed
-} from "../controllers/activity.controller"; // Import your controller functions
+  createActivityWithAssignment,
+} from "../controllers/activity.controller"; 
 
 const router = Router();
 
@@ -29,6 +29,7 @@ router.post(
   createActivity
 );
 
+router.post("/assign", createActivityWithAssignment);
 // Update an activity
 router.put(
   "/:id",
@@ -43,6 +44,5 @@ router.put(
 // Delete an activity
 router.delete("/:id", deleteActivity);
 
-// Add more routes here as needed
 
 export default router;
