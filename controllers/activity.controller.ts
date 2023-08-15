@@ -1,11 +1,14 @@
 import { Request, Response } from "express";
-import Activity from "../models/Classroom/Activity"; // Adjust the path to your Activity model
-
+import Activity from "../models/Classroom/Activity"; // Adjust the path to the Activity model
+import ActivityClass from "../models/Classroom/ActivityClass"; // Import your ActivityClass model
+import ActivityStudent from "../models/Classroom/ActivityStudent";
+import StudentClass from "../models/Classroom/student_class";
+import sequelize from "sequelize/types/sequelize";
 // Create a new activity
 export const createActivity = async (req: Request, res: Response) => {
   try {
     // Extract necessary data from the request body
-    const { name, description, Skills, Time, DateToComplete, ClassId } = req.body;
+    const { name, description, Skills, Time } = req.body;
 
     // Create a new activity using the provided data
     const newActivity = await Activity.create({
@@ -13,8 +16,6 @@ export const createActivity = async (req: Request, res: Response) => {
       description,
       Skills,
       Time,
-      DateToComplete,
-      ClassId
     });
 
     // Respond with the newly created activity
@@ -32,7 +33,7 @@ export const updateActivity = async (req: Request, res: Response) => {
 
   try {
     // Extract data from the request body
-    const { name, description, Skills, Time, DateToComplete, ClassId } = req.body;
+    const { name, description, Skills, Time } = req.body;
 
     // Find the activity by its ID
     const activity = await Activity.findByPk(activityId);
@@ -47,8 +48,6 @@ export const updateActivity = async (req: Request, res: Response) => {
       description,
       Skills,
       Time,
-      DateToComplete,
-      ClassId
     });
 
     // Respond with a success message
@@ -115,6 +114,64 @@ export const getActivityById = async (req: Request, res: Response) => {
     res.json(activity);
   } catch (error) {
     // Handle any errors that may occur
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+export const createActivityWithAssignment = async (req: Request, res: Response) => {
+  const { name, description, Skills, Time, DateToComplete, classId } = req.body;
+
+  const transaction = await sequelize.transaction(); // Start a transaction
+
+  try {
+    // Create a new activity
+    const newActivity = await Activity.create(
+      {
+        name,
+        description,
+        Skills,
+        Time,
+        DateToComplete,
+      },
+      { transaction } // Specify the transaction
+    );
+
+    // Create ActivityClass entry to associate the activity with the class
+    await ActivityClass.create(
+      {
+        ActivityId: newActivity.id,
+        ClassId: classId,
+        DateToComplete,
+      },
+      { transaction } // Specify the transaction
+    );
+
+    // Fetch students in the class from StudentClass
+    const studentsInClass = await StudentClass.findAll({
+      where: {
+        ClassId: classId,
+      },
+    });
+
+    // Create ActivityStudent entries for each student
+    const studentActivityPromises = studentsInClass.map(async (student) => {
+      await ActivityStudent.create(
+        {
+          ActivityId: newActivity.id,
+          StudentEmail: student.StudentEmail,
+        },
+        { transaction } // Specify the transaction
+      );
+    });
+
+    // Execute all studentActivityPromises concurrently
+    await Promise.all(studentActivityPromises);
+
+    await transaction.commit(); // Commit the transaction
+
+    res.status(201).json(newActivity);
+  } catch (error) {
+    await transaction.rollback(); // Rollback the transaction on error
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
