@@ -124,11 +124,12 @@ export const createActivityWithAssignment = async (req: Request, res: Response) 
   const transaction = await sequelize.transaction(); // Start a transaction
 
   try {
-    let existingActivity:any;
+    let existingActivity: any;
 
     // Check if the user already has an existing activity
     if (id) {
       existingActivity = await Activity.findByPk(id);
+      console.log(existingActivity);
     }
 
     if (!existingActivity) {
@@ -151,10 +152,12 @@ export const createActivityWithAssignment = async (req: Request, res: Response) 
         ActivityId: existingActivity.id,
         ClassId: classId,
       },
+      transaction, // Specify the transaction
     });
 
     if (!isAssigned) {
       // If the activity is not assigned to the class, create an ActivityClass entry
+      console.log(existingActivity);
       await ActivityClass.create(
         {
           ActivityId: existingActivity.id,
@@ -170,6 +173,7 @@ export const createActivityWithAssignment = async (req: Request, res: Response) 
       where: {
         ClassId: classId,
       },
+      transaction, // Specify the transaction
     });
 
     // Create ActivityStudent entries for each student
@@ -195,3 +199,5 @@ export const createActivityWithAssignment = async (req: Request, res: Response) 
     res.status(500).json({ message: "Server error" });
   }
 };
+
+

@@ -25,7 +25,7 @@ Activity.init(
       allowNull: true,
     },
     Skills: {
-      type: DataTypes.STRING,
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: true,
     },
     Time: {
