@@ -1,10 +1,10 @@
 import express, {Application} from 'express';
 import cors from 'cors';
 //Routes:
-import classRoutes from "../routes/class.routes"
 import userRoutes from '../routes/person.routes';
-import  authRoutes  from "../routes/auth.routes";
+import classRoutes from "../routes/class.routes"
 import activyRoutes from "../routes/activities.routes";
+import  authRoutes  from "../routes/auth.routes";
 import db from '../db/connection';
 
 class Server{

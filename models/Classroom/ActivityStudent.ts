@@ -33,6 +33,10 @@ ActivityStudents.init(
         key: 'ClassId',
       },
     },
+    grade: {
+      type: DataTypes.JSON, 
+      allowNull: true, 
+    },
   },
   {
     sequelize,

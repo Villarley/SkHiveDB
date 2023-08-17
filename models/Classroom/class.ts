@@ -1,8 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../db/connection";
-import ProfessorClass from "./professor_class";
-import Professor from "../professor";
-import { configureAssociations } from "./associations";
+import Activity from "./Activity"; // Asegúrate de la ruta correcta
+import ActivityClass from "./ActivityClass";
 
 class Class extends Model {
   public id!: number;
@@ -28,17 +27,14 @@ Class.init(
   },
   {
     sequelize,
-    modelName: 'Class',
-    tableName: 'class',
+    modelName: "Class",
+    tableName: "class",
     timestamps: true,
   }
-  );
-  // configureAssociations();
-  
-// Configura la asociación con Professor a través de ProfessorClass
-// Class.belongsToMany(Professor, {
-  //   through: ProfessorClass,
-  //   foreignKey: "ClassId", // Esta es la clave foránea en la tabla ProfessorClass
-  // });
-  export default Class;
-  
+);
+// Class.belongsToMany(Activity, {
+//   through: ActivityClass,
+//   foreignKey: "ClassId",
+//   as: "Activities", // Definimos un alias para la asociación
+// });
+export default Class;

@@ -1,15 +1,18 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../db/connection";
+import Class from "./class";
+import ActivityClass from "./ActivityClass";
 
 class Activity extends Model {
   public id!: number;
   public name!: string;
   public description!: string | null;
-  public Skills!: string | null;
+  public Skills!: string[] | null;
   public Time!: string | null;
 }
 
 Activity.init(
+  
   {
     id: {
       type: DataTypes.INTEGER,
@@ -35,10 +38,15 @@ Activity.init(
   },
   {
     sequelize,
-    modelName: 'Activity',
-    tableName: 'activity',
+    modelName: "Activity",
+    tableName: "activity",
     timestamps: true,
   }
 );
+// Activity.belongsToMany(Class, {
+//   through: ActivityClass,
+//   foreignKey: "ActivityId",
+//   as: "Classes", // Definimos un alias para la asociación
+// });
 
 export default Activity;

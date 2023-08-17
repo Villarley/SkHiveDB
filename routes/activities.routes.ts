@@ -8,6 +8,8 @@ import {
   getActivities,
   getActivityById,
   createActivityWithAssignment,
+  getActivitiesByClassId,
+  updateStudentGrades,
 } from "../controllers/activity.controller"; 
 
 const router = Router();
@@ -40,9 +42,12 @@ router.put(
   validateField,
   updateActivity
 );
-
+router.get("/ClassId/:id", getActivitiesByClassId);
+//update grade
+router.post("/ActivityStudent", updateStudentGrades);
 // Delete an activity
 router.delete("/:id", deleteActivity);
+
 
 
 export default router;

@@ -19,11 +19,17 @@ ActivityClass.init(
     },
     ActivityId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      references: {
+        model: Activity,
+        key: 'id'
+      }
     },
     ClassId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      references: {
+        model: Class,
+        key: 'id'
+      }
     },
     DateToComplete: {
       type: DataTypes.DATE,
@@ -37,5 +43,6 @@ ActivityClass.init(
     timestamps: true,
   }
 );
+
 
 export default ActivityClass;
