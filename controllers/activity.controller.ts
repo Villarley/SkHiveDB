@@ -24,7 +24,7 @@ export const createActivity = async (req: Request, res: Response) => {
   } catch (error) {
     // Handle any errors that may occur
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ msg: "Server error" });
   }
 };
 
@@ -40,7 +40,7 @@ export const updateActivity = async (req: Request, res: Response) => {
     const activity = await Activity.findByPk(activityId);
     if (!activity) {
       // If activity is not found, respond with a 404 error
-      return res.status(404).json({ message: "Activity not found" });
+      return res.status(404).json({ msg: "Activity not found" });
     }
 
     // Update the activity with the provided data
@@ -51,12 +51,12 @@ export const updateActivity = async (req: Request, res: Response) => {
       Time,
     });
 
-    // Respond with a success message
-    res.json({ message: "Activity updated successfully" });
+    // Respond with a success msg
+    res.json({ msg: "Activity updated successfully" });
   } catch (error) {
     // Handle any errors that may occur
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ msg: "Server error" });
   }
 };
 
@@ -69,18 +69,18 @@ export const deleteActivity = async (req: Request, res: Response) => {
     const activity = await Activity.findByPk(activityId);
     if (!activity) {
       // If activity is not found, respond with a 404 error
-      return res.status(404).json({ message: "Activity not found" });
+      return res.status(404).json({ msg: "Activity not found" });
     }
 
     // Delete the activity from the database
     await activity.destroy();
 
-    // Respond with a success message
-    res.json({ message: "Activity deleted successfully" });
+    // Respond with a success msg
+    res.json({ msg: "Activity deleted successfully" });
   } catch (error) {
     // Handle any errors that may occur
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ msg: "Server error" });
   }
 };
 
@@ -95,7 +95,7 @@ export const getActivities = async (req: Request, res: Response) => {
   } catch (error) {
     // Handle any errors that may occur
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ msg: "Server error" });
   }
 };
 
@@ -108,7 +108,7 @@ export const getActivityById = async (req: Request, res: Response) => {
     const activity = await Activity.findByPk(activityId);
     if (!activity) {
       // If activity is not found, respond with a 404 error
-      return res.status(404).json({ message: "Activity not found" });
+      return res.status(404).json({ msg: "Activity not found" });
     }
 
     // Respond with the activity
@@ -116,7 +116,7 @@ export const getActivityById = async (req: Request, res: Response) => {
   } catch (error) {
     // Handle any errors that may occur
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ msg: "Server error" });
   }
 };
 export const createActivityWithAssignment = async (req: Request, res: Response) => {
@@ -196,7 +196,7 @@ export const createActivityWithAssignment = async (req: Request, res: Response) 
   } catch (error) {
     await transaction.rollback(); // Revertir la transacción en caso de error
     console.error(error);
-    res.status(500).json({ message: "Error en el servidor" });
+    res.status(500).json({ msg: "Error en el servidor" });
   }
 };
 
@@ -230,7 +230,7 @@ export const getActivitiesByClassId = async (req: Request, res: Response) => {
   } catch (error) {
     // Handle any errors that may occur
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ msg: "Server error" });
   }
   
 
@@ -249,16 +249,16 @@ export const updateStudentGrades = async (req: Request, res: Response) => {
     });
 
     if (!activityStudent) {
-      return res.status(404).json({ message: "Activity student not found" });
+      return res.status(404).json({ msg: "Activity student not found" });
     }
 
     // Update the grade field with the provided grade data
     await activityStudent.update({ grade });
 
-    res.json({ message: "Student grades updated successfully" });
+    res.json({ msg: "Student grades updated successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ msg: "Server error" });
   }
 };
 

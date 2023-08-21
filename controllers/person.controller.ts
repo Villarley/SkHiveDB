@@ -39,34 +39,40 @@ export const postPerson = async (req: Request, res: Response) => {
   try {
     const { email, name, surnames, password, role, google } = req.body;
 
-    // Encriptar la contraseña
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Crear la persona
-    const newPerson = await Person.create({
-      email,
-      name,
-      surnames,
-      password: hashedPassword,
-      state: true,
-      google,
-    });
-
-    // Verificar si se debe crear un estudiante o un profesor
-    let newRole;
-    if (role === "student") {
-      newRole = await Student.create({ email });
-    } else if (role === "professor" || role ===undefined || role ===null  ) {
-      newRole = await Professor.create({ email });
+    const existingPerson = await Person.findByPk(email);
+    if(!existingPerson) {
+      // Encrypt
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      //Creating person
+      const newPerson = await Person.create({
+        email,
+        name,
+        surnames,
+        password: hashedPassword,
+        state: true,
+        google,
+      });
+  
+      // Verificar si se debe crear un estudiante o un profesor
+      let newRole;
+      if (role === "student") {
+        newRole = await Student.create({ email });
+      } else if (role === "professor" || role ===undefined || role ===null  ) {
+        newRole = await Professor.create({ email });
+      }
+      // const dataEmail = {
+      //   email: newPerson.email||'',
+      //   name: newPerson.name||'',
+      // }
+      // sendEmail(dataEmail, "Welcome");
+      res
+        .status(201)
+        .json({ person: newPerson, msg: "Perfil creado correctamente" });
     }
-    // const dataEmail = {
-    //   email: newPerson.email||'',
-    //   name: newPerson.name||'',
-    // }
-    // sendEmail(dataEmail, "Welcome");
-    res
-      .status(201)
-      .json({ person: newPerson, msg: "Perfil creado correctamente" });
+    else{
+      res.json({msg: "Email asociado a una cuenta"});
+    }
   } catch (error) {
     console.error("Error al crear la persona:", error);
     res.status(500).json({ error: "Error al crear la persona" });
@@ -116,7 +122,7 @@ export const deletePerson = async (req: Request, res: Response) => {
 
     await person.destroy();
 
-    res.json({ message: "Persona eliminada correctamente" });
+    res.json({ msg: "Persona eliminada correctamente" });
   } catch (error) {
     console.error("Error al eliminar la persona:", error);
     res.status(500).json({ error: "Error al eliminar la persona" });

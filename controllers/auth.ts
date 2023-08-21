@@ -10,6 +10,7 @@ import Student from '../models/student';
 import { generateJWT } from '../helpers/generatorJWT';
 import { googleVerify } from '../helpers/google-verify';
 import { sendEmail } from '../utils/sendEmail';
+import { capitalizeNameAndSurnames } from '../utils/capitalizeNameAndSurnames';
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -19,19 +20,19 @@ export const login = async (req: Request, res: Response) => {
     const person = await Person.findByPk(email);
 
     if (!person) {
-      return res.json({ message: 'Email o contraseña incorrectos' });
+      return res.json({ msg: 'Email o contraseña incorrectos' });
     }
 
     // Verificar si el usuario está activo
     if (!person.state) {
-      return res.json({ message: 'Email o contraseña incorrectos - Estado false' });
+      return res.json({ msg: 'Usuario inactivo' });
     }
 
     // Verificar la contraseña
     const validPassword = await bcryptjs.compare(password, person.password as string);
 
     if (!validPassword) {
-      return res.json({ message: 'Email o contraseña incorrectos' });
+      return res.json({ msg: 'Email o contraseña incorrectos' });
     }
 
     // Generar el token JWT
@@ -50,15 +51,14 @@ export const login = async (req: Request, res: Response) => {
 export const googleSignUp = async (req: Request, res: Response) => {
   const { id_token, role } = req.body;
   try {
-    const { name, family_name, email } = await googleVerify(id_token);
+    const { name, family_name, email }:any = await googleVerify(id_token);
     let person = await Person.findByPk(email);
-
-    
+    let firstName = name.split(" ")[0];
+    firstName = capitalizeNameAndSurnames(firstName);
     if (!person) {
-      console.log(role);
       const data = {
         email,
-        name,
+        name: firstName,
         surnames: family_name,
         password: ':P',
         google: true,
@@ -84,11 +84,12 @@ export const googleSignUp = async (req: Request, res: Response) => {
       }
       sendEmail(dataEmail, "Welcome");
       res.json({
-        newPerson,
-        token
+        person: newPerson,
+        token,
+        msg:"Usuario creado",
       });
     } else {
-
+      //generate jwt
       const token = await generateJWT(person.email);
 
       res.json({
@@ -98,7 +99,7 @@ export const googleSignUp = async (req: Request, res: Response) => {
       });
     }
   } catch (err) {
-    res.status(400).json({
+    res.status(401).json({
       ok: false,
       msg: 'No se pudo validar el token'
     });
@@ -107,21 +108,20 @@ export const googleSignUp = async (req: Request, res: Response) => {
 export const googleSignIn = async (req: Request, res: Response) => {
   const { id_token } = req.body;
   const { email } = await googleVerify(id_token)
-  console.log(req.body);
   try {
     // Verificar si el email existe
     const person = await Person.findByPk(email);
     console.log(person);
     if (!person) {
-      return res.json({ message: 'El usuario no esta registrado' });
+      return res.json({ msg: 'El usuario no esta registrado' });
     }
 
     // Verificar si el usuario está activo
     if (!person.state) {
-      return res.json({ message: 'Este usuario esta inactivo' });
+      return res.json({ msg: 'Este usuario esta inactivo' });
     }
     if (!person.google) {
-      return res.json({ message: 'Este usuario no esta registrado con google' });
+      return res.json({ msg: 'Este usuario no esta registrado con google' });
     }
 
     // Verificar la contraseña

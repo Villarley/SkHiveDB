@@ -15,7 +15,7 @@ export const getClasses = async (req: Request, res: Response) => {
     res.json(classes);
   } catch (error) {
     console.error("Error getting classes:", error);
-    res.status(500).json({ message: "Error getting classes" });
+    res.status(500).json({ msg: "Error getting classes" });
   }
 };
 
@@ -38,14 +38,14 @@ export const getClassById = async (req: Request, res: Response) => {
     });
 
     if (!classDetails) {
-      res.status(404).json({ message: "Class not found" });
+      res.status(404).json({ msg: "Class not found" });
       return;
     }
 
     res.json(classDetails);
   } catch (error) {
     console.error("Error getting class details:", error);
-    res.status(500).json({ message: "Error getting class details" });
+    res.status(500).json({ msg: "Error getting class details" });
   }
 };
 
@@ -89,7 +89,7 @@ export const createClass = async (req: Request, res: Response) => {
     res.json(newClass);
   } catch (error) {
     console.error("Error creating the class:", error);
-    res.status(500).json({ message: "Error creating the class" });
+    res.status(500).json({ msg: "Error creating the class" });
   }
 };
 
@@ -103,7 +103,7 @@ export const updateClass = async (req: Request, res: Response) => {
     const classToUpdate = await Class.findByPk(classId);
 
     if (!classToUpdate) {
-      res.status(404).json({ message: "Class not found" });
+      res.status(404).json({ msg: "Class not found" });
       return;
     }
 
@@ -114,7 +114,7 @@ export const updateClass = async (req: Request, res: Response) => {
     res.json(classToUpdate);
   } catch (error) {
     console.error("Error updating the class:", error);
-    res.status(500).json({ message: "Error updating the class" });
+    res.status(500).json({ msg: "Error updating the class" });
   }
 };
 
@@ -127,17 +127,17 @@ export const deleteClass = async (req: Request, res: Response) => {
     const classToDelete = await Class.findByPk(classId);
 
     if (!classToDelete) {
-      res.status(404).json({ message: "Class not found" });
+      res.status(404).json({ msg: "Class not found" });
       return;
     }
 
     // Delete the class
     await classToDelete.destroy();
 
-    res.json({ message: "Class deleted successfully." });
+    res.json({ msg: "Class deleted successfully." });
   } catch (error) {
     console.error("Error deleting the class:", error);
-    res.status(500).json({ message: "Error deleting the class" });
+    res.status(500).json({ msg: "Error deleting the class" });
   }
 };
 
@@ -156,7 +156,7 @@ export const addStudentToClass = async (req: Request, res: Response) => {
     });
 
     if (!classFound) {
-      res.status(404).json({ message: "Class not found" });
+      res.status(404).json({ msg: "Class not found" });
       return;
     }
 
@@ -166,10 +166,10 @@ export const addStudentToClass = async (req: Request, res: Response) => {
       ClassId: classFound.id,
     });
 
-    res.json({ message: "Student added to the class successfully." });
+    res.json({ msg: "Student added to the class successfully." });
   } catch (error) {
     console.error("Error adding the student to the class:", error);
-    res.status(500).json({ message: "Error adding the student to the class" });
+    res.status(500).json({ msg: "Error adding the student to the class" });
   }
 };
 
@@ -191,7 +191,7 @@ export const getStudentsInClass = async (req: Request, res: Response) => {
     });
 
     if (!classFound) {
-      res.status(404).json({ message: "Class not found" });
+      res.status(404).json({ msg: "Class not found" });
       return;
     }
 
@@ -205,7 +205,7 @@ export const getStudentsInClass = async (req: Request, res: Response) => {
     res.json(students);
   } catch (error) {
     console.error("Error getting students in the class:", error);
-    res.status(500).json({ message: "Error getting students in the class" });
+    res.status(500).json({ msg: "Error getting students in the class" });
   }
 };
 
@@ -236,6 +236,6 @@ export const getClassesByProfessor = async (req: Request, res: Response) => {
     res.json(classes);
   } catch (error) {
     console.error("Error getting classes by professor:", error);
-    res.status(500).json({ message: "Error getting classes by professor" });
+    res.status(500).json({ msg: "Error getting classes by professor" });
   }
 };
