@@ -2,7 +2,7 @@
   import sequelize from "../../db/connection";
   import Professor from "../professor"; 
   import Class from "./class"; 
-  import { configureAssociations } from "./associations";
+  // import { configureAssociations } from "./associations";
 
   class ProfessorClass extends Model {
     public ProfessorEmail!: string;

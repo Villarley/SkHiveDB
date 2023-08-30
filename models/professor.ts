@@ -3,7 +3,7 @@ import sequelize from "../db/connection";
 import Class from "./Classroom/class"; // Asegúrate de importar correctamente la clase Class
 import ProfessorClass from "./Classroom/professor_class"; // Asegúrate de importar correctamente la clase ProfessorClass
 import Person from "./person";
-import { configureAssociations } from "./Classroom/associations";
+// import { configureAssociations } from "./Classroom/associations";
 
 // configureAssociations();
 class Professor extends Model {
