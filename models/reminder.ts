@@ -1,5 +1,5 @@
 // models/reminder.ts
-
+import Person from './person';
 import { DataTypes, Model, Sequelize } from 'sequelize';
 
 class Reminder extends Model {
@@ -32,7 +32,7 @@ class Reminder extends Model {
         type: DataTypes.STRING,
         allowNull: false,
         references: {
-          model: 'person', // 'persons' refers to table name
+          model: 'Person', // 'persons' refers to table name
           key: 'email',
         },
       },

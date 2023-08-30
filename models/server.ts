@@ -6,6 +6,7 @@ import  authRoutes  from "../routes/auth.routes";
 import classRoutes from "../routes/class.routes"
 import activyRoutes from "../routes/activities.routes";
 import db from '../db/connection';
+import { configureAssociations } from './Classroom/associations';
 
 class Server{
     private app: Application;
@@ -31,6 +32,8 @@ class Server{
         try{
             //verify connection
             await db.authenticate();
+            //Configuring associations
+            configureAssociations();
             //sync the models
             await db.sync({force: true});
             console.log('DB online')
