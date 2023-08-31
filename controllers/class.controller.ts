@@ -211,8 +211,9 @@ export const getStudentsInClass = async (req: Request, res: Response) => {
 
 // Controller to get classes by a professor's email
 export const getClassesByProfessor = async (req: Request, res: Response) => {
-  const professorEmail = req.params.email; // Change 'id' to 'email' in the route
-
+  const professorEmail = req.params.id;
+  //turning it into a int
+  const cuantity = +req.params.cuantity;
   try {
     // Find all classes associated with the professor
     const professorClasses = await ProfessorClass.findAll({
@@ -231,9 +232,10 @@ export const getClassesByProfessor = async (req: Request, res: Response) => {
       },
       //sorting by last edited
       order: [['updatedAt', 'DESC']],
+      limit:cuantity || classIds.length,
     });
 
-    res.json(classes);
+    res.json({classes, cuantity});
   } catch (error) {
     console.error("Error getting classes by professor:", error);
     res.status(500).json({ msg: "Error getting classes by professor" });
