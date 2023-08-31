@@ -36,6 +36,7 @@ const initModel = (sequelize: Sequelize) => {
             defaultValue: true,
         },
     }, {
+        timestamps: false,
         tableName: 'person',
         sequelize: sequelize,
     });

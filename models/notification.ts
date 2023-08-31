@@ -10,12 +10,12 @@ class Notification extends Model {
 const initModel = (sequelize: Sequelize) => {
     Notification.init({
         id: {
-            type: DataTypes.INTEGER.UNSIGNED,
+            type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
         },
         ActivityClassId: {
-            type: DataTypes.INTEGER.UNSIGNED,
+            type: DataTypes.INTEGER,
             allowNull: true,
             references: {
                 model: 'activity_classes', 
@@ -23,7 +23,7 @@ const initModel = (sequelize: Sequelize) => {
             }
         },
         ReminderId: {
-            type: DataTypes.INTEGER.UNSIGNED,
+            type: DataTypes.INTEGER,
             allowNull: true,
             references: {
                 model: 'reminders',

@@ -1,6 +1,4 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
-import { Student } from "../student";
-import { Class } from "./class";
 
 class StudentClass extends Model {
     public StudentEmail!: string;
@@ -9,9 +7,13 @@ class StudentClass extends Model {
 
 const initModel = (sequelize: Sequelize) => {
     StudentClass.init({
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+        },
         StudentEmail: {
             type: DataTypes.STRING,
-            primaryKey: true,
             references: {
                 model: 'student',
                 key: 'email'
@@ -27,6 +29,10 @@ const initModel = (sequelize: Sequelize) => {
     }, {
         tableName: 'student_class',
         sequelize: sequelize,
+        indexes: [{
+            unique: true,
+            fields: ['StudentEmail', 'ClassId']
+        }]
     });
 };
 

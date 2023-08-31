@@ -16,6 +16,7 @@ const initModel = (sequelize: Sequelize) => {
             }
         },
     }, {
+        timestamps: true,
         tableName: 'professor',
         sequelize: sequelize,
     });

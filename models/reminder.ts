@@ -12,7 +12,7 @@ class Reminder extends Model {
   const initModel = (sequelize: Sequelize) => {
      Reminder.init({
       id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },

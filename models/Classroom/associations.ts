@@ -12,20 +12,25 @@ import { Student, initModel as initStudent } from "../student";
 import { Reminder, initModel as initReminder } from "../reminder"; // Adjust the path
 import { Notification, initModel as initNotification } from "../notification"; // Adjust the path
 
-console.log("1");
 export const initializeModels = () => {
     // Initialize all models
-    initPerson(db);
-    initProfessor(db);
-    initStudent(db);
-    initClass(db);
-    initActivity(db);
-    initActivityClass(db);
-    initActivityStudents(db);
-    initProfessorClass(db);
-    initStudentClass(db);
-    initReminder(db);  // Initialize Reminder model
-    initNotification(db);  // Initialize Notification model
+    try {
+        console.log("1");
+        initPerson(db);
+        initProfessor(db);
+        initStudent(db);
+        initClass(db);
+        initActivity(db);
+        initActivityClass(db);
+        initActivityStudents(db);
+        initProfessorClass(db);
+        initStudentClass(db);
+        initReminder(db);  // Initialize Reminder model
+        initNotification(db);  // Initialize Notification model
+    } catch (error) {
+        console.log(error);
+    }
+
 };
 
 export const configureAssociations = () => {
@@ -111,12 +116,10 @@ export const configureAssociations = () => {
         foreignKey: 'ActivityId',
         targetKey: 'id'
     });
-
     ActivityStudents.belongsTo(StudentClass, {
-        foreignKey: 'ClassId',
-        targetKey: 'ClassId'
+        foreignKey: 'StudentClassId',
+        targetKey: 'id'
     });
-
     // Add associations for Reminders and Notifications if they have relationships with other tables
 };
 
