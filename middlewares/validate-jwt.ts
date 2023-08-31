@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import Person from "../models/person";
+import {Person} from "../models/person";
 import { Model } from "sequelize";
 
 interface CustomRequest extends Request {

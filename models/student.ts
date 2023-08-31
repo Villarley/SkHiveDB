@@ -1,28 +1,24 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../db/connection';
-import Person from './person';
+import { DataTypes, Model, Sequelize } from 'sequelize';
+import { Person } from './person';
 
 class Student extends Model {
-  public email!: string;
+    public email!: string;
 }
 
-Student.init(
-  {
-    email: {
-      type: DataTypes.STRING,
-      primaryKey: true,
-      references: {
-        model: Person,
-        key: 'email',
-      },
-    },
-  },
-  {
-    sequelize,
-    modelName: 'Student',
-    tableName: 'student',
-    timestamps: false,
-  }
-);
+const initModel = (sequelize: Sequelize) => {
+    Student.init({
+        email: {
+            type: DataTypes.STRING,
+            primaryKey: true,
+            references: {
+                model: 'person',
+                key: 'email'
+            }
+        },
+    }, {
+        tableName: 'student',
+        sequelize: sequelize,
+    });
+};
 
-export default Student;
+export { Student, initModel };

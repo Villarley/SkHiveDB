@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
-import Activity from "../models/Classroom/Activity"; // Adjust the path to the Activity model
-import StudentClass from "../models/Classroom/student_class";
-import ActivityClass from "../models/Classroom/ActivityClass"; // Import your ActivityClass model
-import ActivityStudent from "../models/Classroom/ActivityStudent";
+import {Activity} from "../models/Classroom/Activity"; // Adjust the path to the Activity model
+import {StudentClass} from "../models/Classroom/student_class";
+import {ActivityClass} from "../models/Classroom/ActivityClass"; // Import your ActivityClass model
 import sequelize from '../db/connection';
-import ActivityStudents from "../models/Classroom/ActivityStudent";
+import {ActivityStudents} from "../models/Classroom/ActivityStudent";
 // Create a new activity
 export const createActivity = async (req: Request, res: Response) => {
   try {
@@ -177,7 +176,7 @@ export const createActivityWithAssignment = async (req: Request, res: Response) 
     // Crear entradas en ActivityStudent para cada estudiante
     const studentActivityPromises = studentsInClass.map(async (student) => {
       console.log(student.ClassId);
-      await ActivityStudent.create(
+      await ActivityStudents.create(
         {
           ActivityId: existingActivity.id,
           ClassId: student.ClassId,
@@ -241,7 +240,7 @@ export const updateStudentGrades = async (req: Request, res: Response) => {
   console.log(req.body)
   try {
     // Find the entry in ActivityStudents based on ClassId and ActivityId
-    const activityStudent = await ActivityStudent.findOne({
+    const activityStudent = await ActivityStudents.findOne({
       where: {
         ClassId,
         ActivityId,

@@ -1,84 +1,123 @@
-// import { Model } from 'sequelize';
+import db from '../../db/connection'; // Adjust this path to your actual db config file
 
-// import Person from '../person';
-// import Professor from '../professor';
-// import Student from '../student';
-// import Class from './class';
-// import Activity from './Activity';
-// import ActivityClass from './ActivityClass';
-// import ActivityStudent from './ActivityStudent';
-// import ProfessorClass from './professor_class';
-// import StudentClass from './student_class';
-// import Reminder from '../reminder';
-// // import Notification from './notifications';
+import { Activity, initModel as initActivity } from "./Activity";
+import { ActivityClass, initModel as initActivityClass } from "./ActivityClass";
+import { ActivityStudents, initModel as initActivityStudents } from "./ActivityStudent";
+import { Class, initModel as initClass } from "./class";
+import { ProfessorClass, initModel as initProfessorClass } from "./professor_class";
+import { StudentClass, initModel as initStudentClass } from "./student_class";
+import { Person, initModel as initPerson } from "../person";
+import { Professor, initModel as initProfessor } from "../professor";
+import { Student, initModel as initStudent } from "../student";
+import { Reminder, initModel as initReminder } from "../reminder"; // Adjust the path
+import { Notification, initModel as initNotification } from "../notification"; // Adjust the path
 
-// export const configureAssociations = () => {
-//     // Relaciones para Person
-//     Person.hasOne(Professor, {
-//         foreignKey: 'email',
-//         sourceKey: 'email',
-//         onDelete: 'CASCADE',
-//     });
+console.log("1");
+export const initializeModels = () => {
+    // Initialize all models
+    initPerson(db);
+    initProfessor(db);
+    initStudent(db);
+    initClass(db);
+    initActivity(db);
+    initActivityClass(db);
+    initActivityStudents(db);
+    initProfessorClass(db);
+    initStudentClass(db);
+    initReminder(db);  // Initialize Reminder model
+    initNotification(db);  // Initialize Notification model
+};
 
-//     Person.hasOne(Student, {
-//         foreignKey: 'email',
-//         sourceKey: 'email',
-//         onDelete: 'CASCADE',
-//     });
+export const configureAssociations = () => {
+    // Associations for Person
+    Person.hasOne(Professor, {
+        foreignKey: 'email',
+        sourceKey: 'email',
+        as: 'professorDetails'
+    });
 
-//     Person.hasMany(Reminder, {
-//         foreignKey: 'PersonEmail',
-//         sourceKey: 'email',
-//         onDelete: 'CASCADE',
-//     });
+    Person.hasOne(Student, {
+        foreignKey: 'email',
+        sourceKey: 'email',
+        as: 'studentDetails'
+    });
 
-//     // Person.hasMany(Notification, {
-//     //     foreignKey: 'PersonEmail',
-//     //     sourceKey: 'email',
-//     //     onDelete: 'CASCADE',
-//     // });
+    // Associations for Professor
+    Professor.belongsTo(Person, {
+        foreignKey: 'email',
+        targetKey: 'email'
+    });
 
-//     // Relaciones para Class
-//     Class.hasMany(ActivityClass, {
-//         foreignKey: 'ClassId',
-//         sourceKey: 'id',
-//         onDelete: 'CASCADE',
-//     });
+    Professor.belongsToMany(Class, {
+        through: ProfessorClass,
+        foreignKey: 'ProfessorEmail',
+        otherKey: 'ClassId'
+    });
 
-//     Class.belongsToMany(Professor, {
-//         through: ProfessorClass,
-//         foreignKey: 'ClassId',
-//     });
+    // Associations for Student
+    Student.belongsTo(Person, {
+        foreignKey: 'email',
+        targetKey: 'email'
+    });
 
-//     Class.belongsToMany(Student, {
-//         through: StudentClass,
-//         foreignKey: 'ClassId',
-//     });
+    Student.belongsToMany(Class, {
+        through: StudentClass,
+        foreignKey: 'StudentEmail',
+        otherKey: 'ClassId'
+    });
 
-//     // Relaciones para Activity
-//     Activity.hasMany(ActivityClass, {
-//         foreignKey: 'ActivityId',
-//         sourceKey: 'id',
-//         onDelete: 'CASCADE',
-//     });
+    // Associations for Class
+    Class.belongsToMany(Professor, {
+        through: ProfessorClass,
+        foreignKey: 'ClassId',
+        otherKey: 'ProfessorEmail'
+    });
 
-//     Activity.hasMany(ActivityStudent, {
-//         foreignKey: 'ActivityId',
-//         sourceKey: 'id',
-//         onDelete: 'CASCADE',
-//     });
+    Class.belongsToMany(Student, {
+        through: StudentClass,
+        foreignKey: 'ClassId',
+        otherKey: 'StudentEmail'
+    });
 
-//     // Relaciones para ActivityClass y Reminder
-//     // ActivityClass.hasMany(Notification, {
-//     //     foreignKey: 'ActivityClassId',
-//     //     sourceKey: 'id',
-//     //     onDelete: 'CASCADE',
-//     // });
+    Class.hasMany(ActivityClass, {
+        foreignKey: 'ClassId',
+        sourceKey: 'id'
+    });
 
-//     // Reminder.hasMany(Notification, {
-//     //     foreignKey: 'ReminderId',
-//     //     sourceKey: 'id',
-//     //     onDelete: 'CASCADE',
-//     // });
-// };
+    // Associations for Activity
+    Activity.hasMany(ActivityClass, {
+        foreignKey: 'ActivityId',
+        sourceKey: 'id'
+    });
 
+    Activity.hasMany(ActivityStudents, {
+        foreignKey: 'ActivityId',
+        sourceKey: 'id'
+    });
+
+    // Associations for ActivityClass
+    ActivityClass.belongsTo(Activity, {
+        foreignKey: 'ActivityId',
+        targetKey: 'id'
+    });
+
+    ActivityClass.belongsTo(Class, {
+        foreignKey: 'ClassId',
+        targetKey: 'id'
+    });
+
+    // Associations for ActivityStudents
+    ActivityStudents.belongsTo(Activity, {
+        foreignKey: 'ActivityId',
+        targetKey: 'id'
+    });
+
+    ActivityStudents.belongsTo(StudentClass, {
+        foreignKey: 'ClassId',
+        targetKey: 'ClassId'
+    });
+
+    // Add associations for Reminders and Notifications if they have relationships with other tables
+};
+
+// You can then call `initializeModels` before `configureAssociations` in your server setup.

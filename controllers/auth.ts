@@ -2,9 +2,9 @@
 import { Request, Response } from 'express';
 import bcryptjs from "bcrypt";
 //models:
-import Person from '../models/person';
-import Professor from '../models/professor';
-import Student from '../models/student';
+import {Person} from '../models/person';
+import {Professor} from '../models/professor';
+import {Student} from '../models/student';
 //models;
 //My functions
 import { generateJWT } from '../helpers/generatorJWT';

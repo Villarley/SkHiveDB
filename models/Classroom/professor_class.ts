@@ -1,38 +1,34 @@
-  import { DataTypes, Model } from "sequelize";
-  import sequelize from "../../db/connection";
-  import Professor from "../professor"; 
-  import Class from "./class"; 
-  // import { configureAssociations } from "./associations";
+import { DataTypes, Model, Sequelize } from "sequelize";
+import { Professor } from "../professor";
+import { Class } from "./class";
 
-  class ProfessorClass extends Model {
+class ProfessorClass extends Model {
     public ProfessorEmail!: string;
     public ClassId!: number;
-  }
+}
 
-  ProfessorClass.init(
-    {
-      ProfessorEmail: {
-        type: DataTypes.STRING,
-        primaryKey: true,
-        references: {
-          model: Professor,
-          key: 'email',
+const initModel = (sequelize: Sequelize) => {
+    ProfessorClass.init({
+        ProfessorEmail: {
+            type: DataTypes.STRING,
+            primaryKey: true,
+            references: {
+                model: 'professor',
+                key: 'email'
+            }
         },
-      },
-      ClassId: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        references: {
-          model: Class,
-          key: 'id',
+        ClassId: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            references: {
+                model: 'class',
+                key: 'id'
+            }
         },
-      },
-    },
-    {
-      sequelize,
-      modelName: 'ProfessorClass',
-      tableName: 'professor_class',
-      timestamps: false,
-    }
-  );
-  export default ProfessorClass;
+    }, {
+        tableName: 'professor_class',
+        sequelize: sequelize,
+    });
+};
+
+export { ProfessorClass, initModel };

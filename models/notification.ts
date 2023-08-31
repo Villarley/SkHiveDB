@@ -18,7 +18,7 @@ const initModel = (sequelize: Sequelize) => {
             type: DataTypes.INTEGER.UNSIGNED,
             allowNull: true,
             references: {
-                model: 'activity_classes', // nombre de la tabla, no del modelo
+                model: 'activity_classes', 
                 key: 'id'
             }
         },
@@ -26,7 +26,7 @@ const initModel = (sequelize: Sequelize) => {
             type: DataTypes.INTEGER.UNSIGNED,
             allowNull: true,
             references: {
-                model: 'reminders', // nombre de la tabla, no del modelo
+                model: 'reminders',
                 key: 'id'
             }
         },

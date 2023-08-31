@@ -1,9 +1,9 @@
 //
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import Person from "../models/person";
-import Student from "../models/student";
-import Professor from "../models/professor";
+import {Person} from "../models/person";
+import {Student} from "../models/student";
+import {Professor} from "../models/professor";
 import { sendEmail } from "../utils/sendEmail";
 
 // Obtener una persona por su ID

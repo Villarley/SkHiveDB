@@ -2,9 +2,9 @@
 import { Request, Response } from "express";
 import { Op } from "sequelize"; // Op is an operator of Sequelize
 // My models
-import Class from "../models/Classroom/class";
-import ProfessorClass from "../models/Classroom/professor_class";
-import StudentClass from "../models/Classroom/student_class";
+import {Class} from "../models/Classroom/class";
+import {ProfessorClass} from "../models/Classroom/professor_class";
+import {StudentClass} from "../models/Classroom/student_class";
 //Util functions
 import { generateRandomCode } from "../utils/generateCode";
 
