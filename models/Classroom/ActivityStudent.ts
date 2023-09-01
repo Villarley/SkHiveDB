@@ -1,9 +1,10 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
+import { StudentClass } from "./student_class";
 
 class ActivityStudents extends Model {
     public id!: number;
     public ActivityId!: number;
-    public StudentClassId!: number;
+    public ClassId!: number;
 }
 
 const initModel = (sequelize: Sequelize) => {
@@ -11,7 +12,7 @@ const initModel = (sequelize: Sequelize) => {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
-            autoIncrement: true
+            autoIncrement: true,
         },
         ActivityId: {
             type: DataTypes.INTEGER,
@@ -20,20 +21,13 @@ const initModel = (sequelize: Sequelize) => {
                 key: 'id'
             }
         },
-        StudentClassId: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: 'student_class',
-                key: 'id'
-            }
-        },
         grade: {
             type: DataTypes.JSON,
-            allowNull: true
+            allowNull: true,
         },
     }, {
         tableName: 'activity_students',
-        sequelize: sequelize
+        sequelize: sequelize,
     });
 };
 

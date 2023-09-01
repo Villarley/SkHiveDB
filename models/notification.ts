@@ -18,7 +18,7 @@ const initModel = (sequelize: Sequelize) => {
             type: DataTypes.INTEGER,
             allowNull: true,
             references: {
-                model: 'activity_classes', 
+                model: 'activity_class', 
                 key: 'id'
             }
         },

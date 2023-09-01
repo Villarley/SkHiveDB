@@ -32,7 +32,7 @@ class Reminder extends Model {
         type: DataTypes.STRING,
         allowNull: false,
         references: {
-          model: 'Person', // 'persons' refers to table name
+          model: 'person', // 'persons' refers to table name
           key: 'email',
         },
       },

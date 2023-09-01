@@ -178,16 +178,16 @@ export const addStudentToClass = async (req: Request, res: Response) => {
 
 // Controller to get students in a class
 export const getStudentsInClass = async (req: Request, res: Response) => {
-  const classCode = req.params.code; // Change 'id' to 'code' in the route
+  const classCode = req.params.code;
 
   try {
-    // Find the class using the provided code
     const classFound = await Class.findOne({
       where: {
         code: {
           [Op.iLike]: classCode,
         },
       },
+      attributes: ['id'],  // Only select 'id'
     });
 
     if (!classFound) {
@@ -195,11 +195,11 @@ export const getStudentsInClass = async (req: Request, res: Response) => {
       return;
     }
 
-    // Find all students associated with the found class
     const students = await StudentClass.findAll({
       where: {
         ClassId: classFound.id,
       },
+      attributes: ['StudentEmail'],  // Only select 'StudentEmail'
     });
 
     res.json(students);
