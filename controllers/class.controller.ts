@@ -5,9 +5,22 @@ import { Op } from "sequelize"; // Op is an operator of Sequelize
 import {Class} from "../models/Classroom/class";
 import {ProfessorClass} from "../models/Classroom/professor_class";
 import {StudentClass} from "../models/Classroom/student_class";
+import { Student } from "../models/student";
 //Util functions
 import { generateRandomCode } from "../utils/generateCode";
+import { Person } from "../models/person";
 
+interface PersonDetails {
+  name: string;
+  surnames: string;
+}
+
+interface StudentWithPersonDetails extends StudentClass {
+  Student: {
+      email: string;
+      Person: PersonDetails;
+  };
+}
 // Controller to get all classes
 export const getClasses = async (req: Request, res: Response) => {
   try {
@@ -181,31 +194,48 @@ export const getStudentsInClass = async (req: Request, res: Response) => {
   const classCode = req.params.code;
 
   try {
-    const classFound = await Class.findOne({
-      where: {
-        code: {
-          [Op.iLike]: classCode,
+      const classFound = await Class.findOne({
+          where: {
+              code: {
+                  [Op.iLike]: classCode,
+              },
+          },
+      });
+
+      if (!classFound) {
+          res.status(404).json({ msg: "Class not found" });
+          return;
+      }
+
+      const students = (await StudentClass.findAll({
+        where: {
+            ClassId: classFound.id,
         },
-      },
-      attributes: ['id'],  // Only select 'id'
-    });
+        include: [
+            {
+                model: Student,
+                as: "Student",
+                attributes: ["email"],
+                include: [
+                    {
+                        model: Person,
+                        attributes: ["name", "surnames"],
+                    },
+                ],
+            },
+        ],
+    })) as StudentWithPersonDetails[];
 
-    if (!classFound) {
-      res.status(404).json({ msg: "Class not found" });
-      return;
-    }
+      const formattedStudents = students.map(student => ({
+          email: student.Student.email,
+          name: student.Student.Person.name,
+          surnames: student.Student.Person.surnames,
+      }));
 
-    const students = await StudentClass.findAll({
-      where: {
-        ClassId: classFound.id,
-      },
-      attributes: ['StudentEmail'],  // Only select 'StudentEmail'
-    });
-
-    res.json(students);
+      res.json(formattedStudents);
   } catch (error) {
-    console.error("Error getting students in the class:", error);
-    res.status(500).json({ msg: "Error getting students in the class" });
+      console.error("Error getting students in the class:", error);
+      res.status(500).json({ msg: "Error getting students in the class" });
   }
 };
 
