@@ -1,10 +1,10 @@
 import nodeMailer from "nodemailer";
 import { capitalizeNameAndSurnames } from "./capitalizeNameAndSurnames";
+//model:
 interface EmailData {
     email: string;
     name: string;
     surnames: string;
-    // Aquí puedes agregar más propiedades si las necesitas
   }
 export const sendEmail = async (data: EmailData, messageContent: string) => {
     const {email, name, surnames} = data;
