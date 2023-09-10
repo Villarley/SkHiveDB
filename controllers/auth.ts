@@ -11,6 +11,8 @@ import { generateJWT } from '../helpers/generatorJWT';
 import { googleVerify } from '../helpers/google-verify';
 import { sendEmail } from '../utils/sendEmail';
 import { capitalizeNameAndSurnames } from '../utils/capitalizeNameAndSurnames';
+import { format } from 'sequelize/types/utils';
+import { welcomeEmailTemplate } from '../utils/emailTemplates';
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -78,11 +80,11 @@ export const googleSignUp = async (req: Request, res: Response) => {
       
       const token = await generateJWT(newPerson.email);
       const dataEmail = {
-        email: newPerson.email||'',
-        name: newPerson.name||'',
-        surnames: family_name||''
+        email: newPerson.email,
+        name: newPerson.name,
       }
-      sendEmail(dataEmail, "Welcome");
+      const formattedEmailTemplate = welcomeEmailTemplate(dataEmail);
+      sendEmail(formattedEmailTemplate);
       res.json({
         person: newPerson,
         token,
