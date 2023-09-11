@@ -10,6 +10,7 @@ import {
   createActivityWithAssignment,
   getActivitiesByClassId,
   updateStudentGrades,
+  createAiActivity,
 } from "../controllers/activity.controller"; 
 
 const router = Router();
@@ -20,6 +21,8 @@ router.get("/", getActivities);
 // Obtain activity by id
 router.get("/:id", getActivityById);
 
+// Create an activity with gpt model
+router.post("/Davinci", createAiActivity);
 // Create an activity
 router.post(
   "/",

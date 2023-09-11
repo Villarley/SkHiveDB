@@ -4,7 +4,34 @@ import {StudentClass} from "../models/Classroom/student_class";
 import {ActivityClass} from "../models/Classroom/ActivityClass"; // Import your ActivityClass model
 import sequelize from '../db/connection';
 import {ActivityStudents} from "../models/Classroom/ActivityStudent";
+import axios from "axios";
+import dotenv from "dotenv";
 
+dotenv.config();
+// Create a new activity with chatGPT
+export const createAiActivity = async(req:Request, res:Response) =>{
+  try {
+    const { prompt, max_tokens } = req.body;
+
+    const openaiResponse = await axios.post('https://api.openai.com/v1/engines/davinci/completions', {
+        prompt: prompt,
+        max_tokens: max_tokens
+    }, {
+        headers: {
+            'Authorization': `Bearer ${process.env.openAiApi}`,
+            'Content-Type': 'application/json'
+        },
+        responseType: 'stream' 
+    });
+    console.log(res)
+    openaiResponse.data.pipe(res);
+
+} catch (error:any) {
+    const errorMessage = error.response?.data?.error || error.message;
+    const statusCode = error.response?.status || 500;
+    res.status(statusCode).json({ error: errorMessage });
+}
+}
 // Create a new activity
 export const createActivity = async (req: Request, res: Response) => {
   try {
@@ -250,7 +277,7 @@ export const updateStudentGrades = async (req: Request, res: Response) => {
 
     if (!activityStudent) {
       return res.status(404).json({ msg: "Estudiante en actividad no encontrado" });
-    }
+    } 
 
     // Update the grade field with the provided grade data
     await activityStudent.update({ grade });
