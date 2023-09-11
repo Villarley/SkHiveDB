@@ -1,37 +1,25 @@
-import { DataTypes, Model } from "sequelize";
-import sequelize from "../db/connection";
-import Class from "./Classroom/class"; // Asegúrate de importar correctamente la clase Class
-import ProfessorClass from "./Classroom/professor_class"; // Asegúrate de importar correctamente la clase ProfessorClass
-import Person from "./person";
-// import { configureAssociations } from "./Classroom/associations";
+import { DataTypes, Model, Sequelize } from "sequelize";
+import { Person } from "./person";
 
-// configureAssociations();
 class Professor extends Model {
-  public email!: string;
+    public email!: string;
 }
 
-Professor.init(
-  {
-    email: {
-      type: DataTypes.STRING,
-      primaryKey: true,
-      references: {
-        model: Person,
-        key: 'email',
-      },
-    },
-  },
-  {
-    sequelize,
-    modelName: 'Professor',
-    tableName: 'professor',
-    timestamps: false,
-  }
-);
+const initModel = (sequelize: Sequelize) => {
+    Professor.init({
+        email: {
+            type: DataTypes.STRING,
+            primaryKey: true,
+            references: {
+                model: 'person',
+                key: 'email'
+            }
+        },
+    }, {
+        timestamps: true,
+        tableName: 'professor',
+        sequelize: sequelize,
+    });
+};
 
-// Configura la asociación con Class a través de ProfessorClass
-// Professor.belongsToMany(Class, {
-//   through: ProfessorClass,
-//   foreignKey: "ProfessorEmail", // Esta es la clave foránea en la tabla ProfessorClass
-// });
-export default Professor;
+export { Professor, initModel };

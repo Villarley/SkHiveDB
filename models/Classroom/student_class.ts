@@ -1,39 +1,31 @@
-// student_class.ts
-import { DataTypes, Model } from "sequelize";
-import sequelize from "../../db/connection";
-import Student from "../student";
-import Class from "./class";
+import { DataTypes, Model, Sequelize } from "sequelize";
 
 class StudentClass extends Model {
-  public StudentEmail!: string;
-  public ClassId!: number;
+    public id!: number;  // Agregamos el id aquí
+    public StudentEmail!: string;
+    public ClassId!: number;
 }
 
-StudentClass.init(
-  {
-    StudentEmail: {
-      type: DataTypes.STRING,
-      primaryKey: true,
-      references: {
-        model: Student,
-        key: 'email',
-      },
-    },
-    ClassId: {
-      type: DataTypes.INTEGER,
-      unique: true, // Add this line to define a unique constraint
-      references: {
-        model: Class,
-        key: 'id',
-      },
-    },
-  },
-  {
-    sequelize,
-    modelName: 'StudentClass',
-    tableName: 'student_class',
-    timestamps: false,
-  }
-);
+const initModel = (sequelize: Sequelize) => {
+    StudentClass.init({
+        StudentEmail: {
+            type: DataTypes.STRING,
+            references: {
+                model: 'student',
+                key: 'email'
+            }
+        },
+        ClassId: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: 'class',
+                key: 'id'
+            },
+        },
+    }, {
+        tableName: 'student_class',
+        sequelize: sequelize,
+    });
+};
 
-export default StudentClass;
+export { StudentClass, initModel };

@@ -1,5 +1,5 @@
 // models/reminder.ts
-import Person from './person';
+import { Person } from './person';
 import { DataTypes, Model, Sequelize } from 'sequelize';
 
 class Reminder extends Model {
@@ -8,11 +8,11 @@ class Reminder extends Model {
   public description!: string;
   public priority!: string;
   public PersonEmail!: string;
-
-  static initModel(sequelize: Sequelize) {
-    return Reminder.init({
+}
+  const initModel = (sequelize: Sequelize) => {
+     Reminder.init({
       id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },
@@ -32,7 +32,7 @@ class Reminder extends Model {
         type: DataTypes.STRING,
         allowNull: false,
         references: {
-          model: 'Person', // 'persons' refers to table name
+          model: 'person', // 'persons' refers to table name
           key: 'email',
         },
       },
@@ -41,6 +41,6 @@ class Reminder extends Model {
       sequelize: sequelize,
     });
   }
-}
 
-export default Reminder;
+
+export { Reminder, initModel };

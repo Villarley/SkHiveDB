@@ -1,12 +1,14 @@
 import express, {Application} from 'express';
+//connection
+import db from '../db/connection';
 import cors from 'cors';
 //Routes:
 import userRoutes from '../routes/person.routes';
 import  authRoutes  from "../routes/auth.routes";
 import classRoutes from "../routes/class.routes"
 import activyRoutes from "../routes/activities.routes";
-import db from '../db/connection';
-// import { configureAssociations } from './Classroom/associations';
+import notificationRoutes from "../routes/notifications.routes"
+import { configureAssociations, initializeModels } from './Classroom/associations';
 
 class Server{
     private app: Application;
@@ -18,6 +20,7 @@ class Server{
         person: '/api/person/',
         classes:'/api/classes/',
         activities:'/api/activities/',
+        notifications:'/api/notifications/',
     }
     constructor(){
         this.app = express();
@@ -32,10 +35,11 @@ class Server{
         try{
             //verify connection
             await db.authenticate();
-            //Configuring associations
-            // configureAssociations();
             //sync the models
+            await initializeModels();
+            await configureAssociations();
             await db.sync({force: true});
+            //Configuring associations
             console.log('DB online')
         }catch(error){
             throw error;
@@ -57,6 +61,7 @@ class Server{
         this.app.use( this.apiPaths.person, userRoutes );
         this.app.use( this.apiPaths.classes, classRoutes ); 
         this.app.use( this.apiPaths.activities, activyRoutes ); 
+        this.app.use( this.apiPaths.notifications, notificationRoutes); 
 
     }
 
