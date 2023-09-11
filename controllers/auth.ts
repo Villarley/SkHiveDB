@@ -2,33 +2,35 @@
 import { Request, Response } from 'express';
 import bcryptjs from "bcrypt";
 //models:
-import Person from '../models/person';
-import Professor from '../models/professor';
-import Student from '../models/student';
+import {Person} from '../models/person';
+import {Professor} from '../models/professor';
+import {Student} from '../models/student';
 //models;
 //My functions
 import { generateJWT } from '../helpers/generatorJWT';
 import { googleVerify } from '../helpers/google-verify';
 import { sendEmail } from '../utils/sendEmail';
 import { capitalizeNameAndSurnames } from '../utils/capitalizeNameAndSurnames';
+import { format } from 'sequelize/types/utils';
+import { welcomeEmailTemplate } from '../utils/emailTemplates';
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
-    // Verificar si el email existe
+    // Verify if there is an existing user
     const person = await Person.findByPk(email);
 
     if (!person) {
       return res.json({ msg: 'Email o contraseña incorrectos' });
     }
 
-    // Verificar si el usuario está activo
+    // Verify if active
     if (!person.state) {
       return res.json({ msg: 'Usuario inactivo' });
     }
 
-    // Verificar la contraseña
+    // Verify password
     const validPassword = await bcryptjs.compare(password, person.password as string);
 
     if (!validPassword) {
@@ -51,6 +53,7 @@ export const login = async (req: Request, res: Response) => {
 export const googleSignUp = async (req: Request, res: Response) => {
   const { id_token, role } = req.body;
   try {
+    //deconstructing google's payload
     const { name, family_name, email }:any = await googleVerify(id_token);
     let person = await Person.findByPk(email);
     let firstName = name.split(" ")[0];
@@ -60,15 +63,14 @@ export const googleSignUp = async (req: Request, res: Response) => {
         email,
         name: firstName,
         surnames: family_name,
-        password: ':P',
+        password: '3.1415926',
         google: true,
         state: true
       };
       
       const newPerson = await Person.create(data);
-      console.log(newPerson);
 
-      // Verificar si se debe crear un estudiante o un profesor
+      // Verifying 
       let newRole;
       if (role === 'student') {
         newRole = await Student.create({ email });
@@ -78,11 +80,11 @@ export const googleSignUp = async (req: Request, res: Response) => {
       
       const token = await generateJWT(newPerson.email);
       const dataEmail = {
-        email: newPerson.email||'',
-        name: newPerson.name||'',
-        surnames: family_name||''
+        email: newPerson.email,
+        name: newPerson.name,
       }
-      sendEmail(dataEmail, "Welcome");
+      const formattedEmailTemplate = welcomeEmailTemplate(dataEmail);
+      sendEmail(formattedEmailTemplate);
       res.json({
         person: newPerson,
         token,
@@ -109,14 +111,13 @@ export const googleSignIn = async (req: Request, res: Response) => {
   const { id_token } = req.body;
   const { email } = await googleVerify(id_token)
   try {
-    // Verificar si el email existe
+    // Verify if exists
     const person = await Person.findByPk(email);
-    console.log(person);
     if (!person) {
       return res.json({ msg: 'El usuario no esta registrado' });
     }
 
-    // Verificar si el usuario está activo
+    // Verify if active
     if (!person.state) {
       return res.json({ msg: 'Este usuario esta inactivo' });
     }

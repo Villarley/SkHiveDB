@@ -1,10 +1,11 @@
 //
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import Person from "../models/person";
-import Student from "../models/student";
-import Professor from "../models/professor";
+import {Person} from "../models/person";
+import {Student} from "../models/student";
+import {Professor} from "../models/professor";
 import { sendEmail } from "../utils/sendEmail";
+import { welcomeEmailTemplate } from "../utils/emailTemplates";
 
 // Obtener una persona por su ID
 export const getPerson = async (req: Request, res: Response, data: any) => {
@@ -61,11 +62,12 @@ export const postPerson = async (req: Request, res: Response) => {
       } else if (role === "professor" || role ===undefined || role ===null  ) {
         newRole = await Professor.create({ email });
       }
-      // const dataEmail = {
-      //   email: newPerson.email||'',
-      //   name: newPerson.name||'',
-      // }
-      // sendEmail(dataEmail, "Welcome");
+      const dataEmail = {
+        email: newPerson.email,
+        name: newPerson.name,
+      }
+      const formattedEmailTemplate = welcomeEmailTemplate(dataEmail);
+      sendEmail(formattedEmailTemplate);
       res
         .status(201)
         .json({ person: newPerson, msg: "Perfil creado correctamente" });
