@@ -1,11 +1,13 @@
 import express, {Application} from 'express';
+//connection
+import db from '../db/connection';
 import cors from 'cors';
 //Routes:
 import userRoutes from '../routes/person.routes';
 import  authRoutes  from "../routes/auth.routes";
 import classRoutes from "../routes/class.routes"
 import activyRoutes from "../routes/activities.routes";
-import db from '../db/connection';
+import notificationRoutes from "../routes/notifications.routes"
 import { configureAssociations, initializeModels } from './Classroom/associations';
 
 class Server{
@@ -18,6 +20,7 @@ class Server{
         person: '/api/person/',
         classes:'/api/classes/',
         activities:'/api/activities/',
+        notifications:'/api/notifications/',
     }
     constructor(){
         this.app = express();
@@ -58,6 +61,7 @@ class Server{
         this.app.use( this.apiPaths.person, userRoutes );
         this.app.use( this.apiPaths.classes, classRoutes ); 
         this.app.use( this.apiPaths.activities, activyRoutes ); 
+        this.app.use( this.apiPaths.notifications, notificationRoutes); 
 
     }
 

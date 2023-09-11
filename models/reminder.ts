@@ -1,5 +1,5 @@
 // models/reminder.ts
-import {Person} from './person';
+import { Person } from './person';
 import { DataTypes, Model, Sequelize } from 'sequelize';
 
 class Reminder extends Model {

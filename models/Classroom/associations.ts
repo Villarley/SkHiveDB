@@ -151,6 +151,57 @@ export const configureAssociations = () => {
     foreignKey: "ClassId",
     targetKey: "ClassId",
   });
+    // A Person can have multiple reminders.
+    Person.hasMany(Reminder, {
+      foreignKey: "PersonEmail",
+      sourceKey: "email",
+    });
+  
+    // --- REMINDER ASSOCIATIONS ---
+    Reminder.belongsTo(Person, {
+      foreignKey: "PersonEmail",
+      targetKey: "email",
+    });
+  
+    // --- NOTIFICATION ASSOCIATIONS ---
+    Notification.belongsTo(ActivityClass, {
+      foreignKey: "ActivityClassId",
+      targetKey: "id",
+    });
+  
+    Notification.belongsTo(Reminder, {
+      foreignKey: "ReminderId",
+      targetKey: "id",
+    });
+    // --- ACTIVITY ASSOCIATIONS ---
+    Activity.hasMany(ActivityClass, {
+      foreignKey: "ActivityId",
+      sourceKey: "id",
+    });
+  
+    Activity.hasMany(ActivityStudents, {
+      foreignKey: "ActivityId",
+      sourceKey: "id",
+    });
+  
+    ActivityClass.belongsTo(Activity, {
+      foreignKey: "ActivityId",
+      targetKey: "id",
+    });
+    ActivityClass.belongsTo(Class, {
+      foreignKey: "ClassId",
+      targetKey: "id",
+    });
+  
+    ActivityStudents.belongsTo(Activity, {
+      foreignKey: "ActivityId",
+      targetKey: "id",
+    });
+    ActivityStudents.belongsTo(StudentClass, {
+      foreignKey: "ClassId",
+      targetKey: "ClassId",
+    });
+  
 };
 
 
