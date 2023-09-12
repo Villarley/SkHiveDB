@@ -9,29 +9,58 @@ import dotenv from "dotenv";
 
 dotenv.config();
 // Create a new activity with chatGPT
-export const createAiActivity = async(req:Request, res:Response) =>{
+export const createAiActivity = async(req:Request, res:Response ) =>{
   try {
-    const prompt = req.body.messages[0].content;
-    const max_tokens = req.body.max_tokens || 150;
+      const { prompt } = req.body;
 
-    const openaiResponse = await axios.post('https://api.openai.com/v1/engines/davinci/completions', {
-      prompt: prompt,
-      max_tokens: max_tokens
-    }, {
-      headers: {
-        'Authorization': `Bearer ${process.env.openAiApi}`,
-        'Content-Type': 'application/json'
-      },
-      responseType: 'stream' 
-    });
-    openaiResponse.data.pipe(res);
+      const openaiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
+          "model": "gpt-3.5-turbo",
+          "messages": [{"role": "user", "content": `${prompt}`}],
+          "temperature": 0.7,
+          "stream": true
+      }, {
+          headers: {
+              'Authorization': `Bearer ${process.env.openAiApi}`,
+              'Content-Type': 'application/json'
+          },
+          responseType: 'text'  // Cambiamos a 'text' en lugar de 'stream'
+      });
+
+      const responseData = openaiResponse.data;
+      const lines:any = responseData.split('\n');
+      const validJsonLines = lines.filter(line => {
+          try {
+              JSON.parse(line);
+              return true;
+          } catch (e) {
+              return false;
+          }
+      });
+
+      if (validJsonLines.length > 0) {
+          const lastValidJson = validJsonLines[validJsonLines.length - 1];
+          const parsedData = JSON.parse(lastValidJson);
+          if (parsedData.choices && parsedData.choices.length > 0) {
+              const messageContent = parsedData.choices[0].text;
+              res.json({ messageContent });
+          } else {
+              res.status(500).json({ error: "No response from OpenAI" });
+          }
+      } else {
+          res.status(500).json({ error: "No valid JSON in response from OpenAI" });
+      }
 
   } catch (error:any) {
-    const errorMessage = error.response?.data?.error || error.message;
-    const statusCode = error.response?.status || 500;
-    res.status(statusCode).json({ error: errorMessage });
+      if (error.response) {
+          const errorMessage = error.response.data?.error || error.message;
+          const statusCode = error.response.status || 500;
+          res.status(statusCode).json({ error: errorMessage });
+      } else {
+          res.status(500).json({ error: error.message });
+      }
+      console.error(error);
   }
-}
+};
 // Create a new activity
 export const createActivity = async (req: Request, res: Response) => {
   try {
