@@ -11,26 +11,26 @@ dotenv.config();
 // Create a new activity with chatGPT
 export const createAiActivity = async(req:Request, res:Response) =>{
   try {
-    const { prompt, max_tokens } = req.body;
+    const prompt = req.body.messages[0].content;
+    const max_tokens = req.body.max_tokens || 150;
 
     const openaiResponse = await axios.post('https://api.openai.com/v1/engines/davinci/completions', {
-        prompt: prompt,
-        max_tokens: max_tokens
+      prompt: prompt,
+      max_tokens: max_tokens
     }, {
-        headers: {
-            'Authorization': `Bearer ${process.env.openAiApi}`,
-            'Content-Type': 'application/json'
-        },
-        responseType: 'stream' 
+      headers: {
+        'Authorization': `Bearer ${process.env.openAiApi}`,
+        'Content-Type': 'application/json'
+      },
+      responseType: 'stream' 
     });
-    console.log(res)
     openaiResponse.data.pipe(res);
 
-} catch (error:any) {
+  } catch (error:any) {
     const errorMessage = error.response?.data?.error || error.message;
     const statusCode = error.response?.status || 500;
     res.status(statusCode).json({ error: errorMessage });
-}
+  }
 }
 // Create a new activity
 export const createActivity = async (req: Request, res: Response) => {
