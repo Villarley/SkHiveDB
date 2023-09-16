@@ -4,7 +4,8 @@ import { DataTypes, Model, Sequelize } from 'sequelize';
 
 class Reminder extends Model {
   public id!: number;
-  public Date!: Date;
+  public title!: string;
+  public date!: Date;
   public description!: string;
   public priority!: string;
   public PersonEmail!: string;
@@ -16,7 +17,10 @@ class Reminder extends Model {
         autoIncrement: true,
         primaryKey: true,
       },
-      Date: {
+      title:{
+        type :DataTypes.STRING
+      },
+      date: {
         type: DataTypes.DATE,
         allowNull: false,
       },

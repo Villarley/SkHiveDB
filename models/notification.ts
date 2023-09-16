@@ -5,6 +5,7 @@ class Notification extends Model {
     public ActivityClassId!: number;
     public ReminderId!: number;
     public read!: boolean;
+    public tokenDevice!: string;
 }
 
 const initModel = (sequelize: Sequelize) => {
@@ -34,7 +35,11 @@ const initModel = (sequelize: Sequelize) => {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false
-        }
+        },
+        tokenDevice:{
+            type: DataTypes.STRING,
+            allowNull:false,
+        },
     }, {
         tableName: 'notifications',
         sequelize: sequelize, // this bit is important

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import {Notification} from '../models/notification';
+import fcmService from '../services/fcmService';
 
 export const getNotifications = async (req: Request, res: Response) => {
     try {

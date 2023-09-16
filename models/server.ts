@@ -8,6 +8,7 @@ import  authRoutes  from "../routes/auth.routes";
 import classRoutes from "../routes/class.routes"
 import activyRoutes from "../routes/activities.routes";
 import notificationRoutes from "../routes/notifications.routes"
+import remindersRoutes from "../routes/reminders.routes"
 //initializations:
 import { configureAssociations, initializeModels } from './Classroom/associations';
 import "../config/firebaseConfig";
@@ -23,6 +24,7 @@ class Server{
         classes:'/api/classes/',
         activities:'/api/activities/',
         notifications:'/api/notifications/',
+        reminders:'/api/reminders/',
     }
     constructor(){
         this.app = express();
@@ -64,6 +66,7 @@ class Server{
         this.app.use( this.apiPaths.classes, classRoutes ); 
         this.app.use( this.apiPaths.activities, activyRoutes ); 
         this.app.use( this.apiPaths.notifications, notificationRoutes); 
+        this.app.use( this.apiPaths.reminders, remindersRoutes); 
 
     }
 
