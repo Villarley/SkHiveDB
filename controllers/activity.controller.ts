@@ -17,7 +17,6 @@ export const createAiActivity = async (req: Request, res: Response) => {
 
   try {
       const { content } = req.body.messages[0];
-      console.log(req.body);
 
       if (!content || content.trim() === '') {
           return res.status(400).json({ error: "El campo 'content' es requerido y no puede estar vacío." });
