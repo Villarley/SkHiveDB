@@ -4,6 +4,51 @@ import {StudentClass} from "../models/Classroom/student_class";
 import {ActivityClass} from "../models/Classroom/ActivityClass"; // Import your ActivityClass model
 import sequelize from '../db/connection';
 import {ActivityStudents} from "../models/Classroom/ActivityStudent";
+import axios from "axios";
+import OpenAI from "openai";
+import dotenv from "dotenv";
+
+dotenv.config();
+// Create a new activity with chatGPT
+export const createAiActivity = async (req: Request, res: Response) => {
+  const openai = new OpenAI({
+      apiKey: process.env.openAiApi,
+  });
+
+  try {
+      const { content } = req.body.messages[0];
+
+      if (!content || content.trim() === '') {
+          return res.status(400).json({ error: "El campo 'content' es requerido y no puede estar vacío." });
+      }
+
+      const stream = await openai.chat.completions.create({
+          model: 'gpt-3.5-turbo',
+          messages: [{ role: 'user', content: content }],
+          stream: true,
+      });
+
+      // Usar Server Sent Events (SSE) para enviar respuestas en streaming al frontend
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+
+      for await (const part of stream) {
+          const messageContent = part.choices[0]?.delta?.content || '';
+          res.write(`${ messageContent }`); // Enviar datos en formato SSE
+      }
+
+      res.end();
+
+  } catch (error:any) {
+      if (error instanceof OpenAI.APIError) {
+          res.json({ error: error.message });
+      } else {
+          res.status(500).json({ error: error.message });
+      }
+      console.error(error);
+  }
+};
 
 // Create a new activity
 export const createActivity = async (req: Request, res: Response) => {
@@ -250,7 +295,7 @@ export const updateStudentGrades = async (req: Request, res: Response) => {
 
     if (!activityStudent) {
       return res.status(404).json({ msg: "Estudiante en actividad no encontrado" });
-    }
+    } 
 
     // Update the grade field with the provided grade data
     await activityStudent.update({ grade });
