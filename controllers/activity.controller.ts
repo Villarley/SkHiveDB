@@ -5,62 +5,52 @@ import {ActivityClass} from "../models/Classroom/ActivityClass"; // Import your 
 import sequelize from '../db/connection';
 import {ActivityStudents} from "../models/Classroom/ActivityStudent";
 import axios from "axios";
+import OpenAI from "openai";
 import dotenv from "dotenv";
 
 dotenv.config();
 // Create a new activity with chatGPT
-export const createAiActivity = async(req:Request, res:Response ) =>{
+export const createAiActivity = async (req: Request, res: Response) => {
+  const openai = new OpenAI({
+      apiKey: process.env.openAiApi,
+  });
+
   try {
-      const { prompt } = req.body;
+      const { content } = req.body.messages[0];
+      console.log(req.body);
 
-      const openaiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
-          "model": "gpt-3.5-turbo",
-          "messages": [{"role": "user", "content": `${prompt}`}],
-          "temperature": 0.7,
-          "stream": true
-      }, {
-          headers: {
-              'Authorization': `Bearer ${process.env.openAiApi}`,
-              'Content-Type': 'application/json'
-          },
-          responseType: 'text'  // Cambiamos a 'text' en lugar de 'stream'
-      });
-
-      const responseData = openaiResponse.data;
-      const lines:any = responseData.split('\n');
-      const validJsonLines = lines.filter(line => {
-          try {
-              JSON.parse(line);
-              return true;
-          } catch (e) {
-              return false;
-          }
-      });
-
-      if (validJsonLines.length > 0) {
-          const lastValidJson = validJsonLines[validJsonLines.length - 1];
-          const parsedData = JSON.parse(lastValidJson);
-          if (parsedData.choices && parsedData.choices.length > 0) {
-              const messageContent = parsedData.choices[0].text;
-              res.json({ messageContent });
-          } else {
-              res.status(500).json({ error: "No response from OpenAI" });
-          }
-      } else {
-          res.status(500).json({ error: "No valid JSON in response from OpenAI" });
+      if (!content || content.trim() === '') {
+          return res.status(400).json({ error: "El campo 'content' es requerido y no puede estar vacío." });
       }
 
+      const stream = await openai.chat.completions.create({
+          model: 'gpt-3.5-turbo',
+          messages: [{ role: 'user', content: content }],
+          stream: true,
+      });
+
+      // Usar Server Sent Events (SSE) para enviar respuestas en streaming al frontend
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+
+      for await (const part of stream) {
+          const messageContent = part.choices[0]?.delta?.content || '';
+          res.write(`${ messageContent }`); // Enviar datos en formato SSE
+      }
+
+      res.end();
+
   } catch (error:any) {
-      if (error.response) {
-          const errorMessage = error.response.data?.error || error.message;
-          const statusCode = error.response.status || 500;
-          res.status(statusCode).json({ error: errorMessage });
+      if (error instanceof OpenAI.APIError) {
+          res.status(error.status).json({ error: error.message });
       } else {
           res.status(500).json({ error: error.message });
       }
       console.error(error);
   }
 };
+
 // Create a new activity
 export const createActivity = async (req: Request, res: Response) => {
   try {
