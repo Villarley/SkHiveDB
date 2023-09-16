@@ -42,7 +42,7 @@ export const createAiActivity = async (req: Request, res: Response) => {
 
   } catch (error:any) {
       if (error instanceof OpenAI.APIError) {
-          res.status(error.status).json({ error: error.message });
+          res.json({ error: error.message });
       } else {
           res.status(500).json({ error: error.message });
       }
