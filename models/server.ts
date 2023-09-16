@@ -8,7 +8,9 @@ import  authRoutes  from "../routes/auth.routes";
 import classRoutes from "../routes/class.routes"
 import activyRoutes from "../routes/activities.routes";
 import notificationRoutes from "../routes/notifications.routes"
+//initializations:
 import { configureAssociations, initializeModels } from './Classroom/associations';
+import "../config/firebaseConfig";
 
 class Server{
     private app: Application;
