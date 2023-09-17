@@ -153,13 +153,13 @@ export const configureAssociations = () => {
   });
     // A Person can have multiple reminders.
     Person.hasMany(Reminder, {
-      foreignKey: "PersonEmail",
+      foreignKey: "personEmail",
       sourceKey: "email",
     });
   
     // --- REMINDER ASSOCIATIONS ---
     Reminder.belongsTo(Person, {
-      foreignKey: "PersonEmail",
+      foreignKey: "personEmail",
       targetKey: "email",
     });
   

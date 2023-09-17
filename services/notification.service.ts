@@ -1,13 +1,15 @@
 import { Notification } from '../models/notification';
-import fcmService from './fcmService';
 import cron from "node-cron";
-import moment from "moment-timezone"
+import moment from "moment-timezone";
+import { sendEmail } from '../utils/sendEmail';
+import fcmService from './fcmService';
+import { notificationEmailTemplate } from '../utils/emailTemplates';
 
 class NotificationService {
     // Create a new notification and send a push notification.
     async createNotification(data: any): Promise<Notification> {
         const notification = await Notification.create(data);
-        const { title, description, date, tokenDevice } = data;
+        const { title, description, date, tokenDevice, personEmail } = data;
 
         const timezone = 'America/Costa_Rica';
 
@@ -16,18 +18,22 @@ class NotificationService {
 
         // Check if the scheduled date is in the future
         console.log(scheduledDate,currentDate);
+        const formattedEmailTemplate = await notificationEmailTemplate({ title, description, personEmail });
         if (scheduledDate.isAfter(currentDate)) {
+            //formatting the email
             // Convert the scheduled date to a cron expression
             const cronExpression = `${scheduledDate.minute()} ${scheduledDate.hour()} ${scheduledDate.date()} ${scheduledDate.month() + 1} *`;
     
             cron.schedule(cronExpression, async () => {
                 if (tokenDevice) {
+                    await sendEmail(formattedEmailTemplate);
                     await fcmService.sendNotification(tokenDevice, title, description);
                 }
             });
         } else {
             // Send the notification immediately if the date is not in the future
             if (tokenDevice) {
+                await sendEmail(formattedEmailTemplate);
                 await fcmService.sendNotification(tokenDevice, title, description);
             }
         }

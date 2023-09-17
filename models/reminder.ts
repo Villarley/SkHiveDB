@@ -8,7 +8,7 @@ class Reminder extends Model {
   public date!: Date;
   public description!: string;
   public priority!: string;
-  public PersonEmail!: string;
+  public personEmail!: string;
 }
   const initModel = (sequelize: Sequelize) => {
      Reminder.init({
@@ -32,7 +32,7 @@ class Reminder extends Model {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      PersonEmail: {
+      personEmail: {
         type: DataTypes.STRING,
         allowNull: false,
         references: {

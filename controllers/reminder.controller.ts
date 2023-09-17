@@ -31,8 +31,8 @@ export const createReminder = async (req: Request, res: Response) => {
   try {
     const reminder = await Reminder.create(req.body);
     const { tokenDevice } = req.body;
-    const { title, description, date } = reminder;
-    const data = { title, description, date, tokenDevice }; //constructing the variable that will be used for creating the notification
+    const { title, description, date, personEmail } = reminder;
+    const data = { title, description, date, tokenDevice, personEmail }; //constructing the variable that will be used for creating the notification
     const notification = await notificationService.createNotification(data);
     if (notification) {
         res.status(201).json({reminder, msg:"Recordatorio creado exitosamente"});
