@@ -9,6 +9,7 @@ class Reminder extends Model {
   public description!: string;
   public priority!: string;
   public personEmail!: string;
+  public class!: string;
 }
   const initModel = (sequelize: Sequelize) => {
      Reminder.init({
@@ -39,6 +40,10 @@ class Reminder extends Model {
           model: 'person', // 'persons' refers to table name
           key: 'email',
         },
+      },
+      class:{
+        type: DataTypes.STRING,
+        allowNull: true,
       },
     }, {
       tableName: 'reminders',

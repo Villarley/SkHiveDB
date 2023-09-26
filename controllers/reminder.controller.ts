@@ -4,9 +4,10 @@ import { Request, Response } from "express";
 import { Reminder } from "../models/reminder";
 import notificationService from "../services/notification.service";
 
-export const getAllReminders = async (req: Request, res: Response) => {
+export const getAllRemindersByUserEmail = async (req: Request, res: Response) => {
   try {
-    const reminders = await Reminder.findAll();
+    const {email} = req.params;
+    const reminders = await Reminder.findAll({where: {personEmail: email}}); 
     res.json(reminders);
   } catch (error) {
     res.status(500).json({ message: "Error retrieving reminders", error });
@@ -29,6 +30,7 @@ export const getReminderById = async (req: Request, res: Response) => {
 
 export const createReminder = async (req: Request, res: Response) => {
   try {
+    console.log(req.body);
     const reminder = await Reminder.create(req.body);
     const { tokenDevice } = req.body;
     const { title, description, date, personEmail } = reminder;

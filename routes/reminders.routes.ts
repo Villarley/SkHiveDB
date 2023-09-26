@@ -2,7 +2,7 @@
 
 import express from 'express';
 import {
-    getAllReminders,
+    getAllRemindersByUserEmail,
     getReminderById,
     createReminder,
     updateReminder,
@@ -11,7 +11,7 @@ import {
 
 const router = express.Router();
 
-router.get('/', getAllReminders);
+router.get('/email/:email', getAllRemindersByUserEmail);
 router.get('/:id', getReminderById);
 router.post('/', createReminder);
 router.put('/:id', updateReminder);
