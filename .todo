@@ -1,25 +1,2 @@
-# Backend Notifications Task List
-
-## Database
-- [x] Set up notifications table.
-- [x] Define schema: ID, user ID, content, timestamp, read status.
-
-## API Endpoints
-- [ ] `GET` - Retrieve notifications for a user.
-- [ ] `POST` - Create a new notification.
-- [ ] `PUT` - Update notification read status.
-
-## Logic
-- [ ] Implement notification creation logic.
-- [ ] Implement logic to mark notifications as read.
-
-## Testing
-- [ ] Unit test for notification creation.
-- [ ] Unit test for retrieving notifications.
-- [ ] Unit test for updating read status.
-
-## Deployment
-- [ ] Migrate database changes.
-- [ ] Deploy updated backend code.
-
-# Archive
+[] -Change :p passwords
+[] -Add photo
