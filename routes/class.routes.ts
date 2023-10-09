@@ -50,7 +50,7 @@ router.delete("/:id", deleteClass);
 router.post("/add-student", addStudentToClass);
 
 // Getting all the students by class 
-router.get("/students/:code", getStudentsInClass);
+router.get("/students/:id", getStudentsInClass);
 // Getting all the classes that remains to a professor
 router.get("/professor/:id/:cuantity", getClassesByProfessor);
 

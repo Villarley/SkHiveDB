@@ -191,16 +191,10 @@ export const addStudentToClass = async (req: Request, res: Response) => {
 
 // Controller to get students in a class
 export const getStudentsInClass = async (req: Request, res: Response) => {
-  const classCode = req.params.code;
+  const { id } = req.params;
 
   try {
-      const classFound = await Class.findOne({
-          where: {
-              code: {
-                  [Op.iLike]: classCode,
-              },
-          },
-      });
+      const classFound = await Class.findByPk(id);
 
       if (!classFound) {
           res.status(404).json({ msg: "Class not found" });
