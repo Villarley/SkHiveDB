@@ -21,6 +21,10 @@ const initModel = (sequelize: Sequelize) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
+        section:{
+            type: DataTypes.STRING,
+            allowNull: false,
+        }
     }, {
         tableName: 'class',
         sequelize: sequelize,

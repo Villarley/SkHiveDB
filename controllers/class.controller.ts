@@ -35,7 +35,6 @@ export const getClasses = async (req: Request, res: Response) => {
 // Controller to get class details by its ID
 export const getClassById = async (req: Request, res: Response) => {
   const classId = parseInt(req.params.id);
-
   try {
     const classDetails = await Class.findByPk(classId, {
       include: [
@@ -54,7 +53,6 @@ export const getClassById = async (req: Request, res: Response) => {
       res.status(404).json({ msg: "Class not found" });
       return;
     }
-
     res.json(classDetails);
   } catch (error) {
     console.error("Error getting class details:", error);
@@ -65,7 +63,7 @@ export const getClassById = async (req: Request, res: Response) => {
 // Controller to create a new class
 export const createClass = async (req: Request, res: Response) => {
   // Always send the email here
-  const { name, email } = req.body;
+  const { name, email, section } = req.body;
 
   try {
     // Create a new entry in the "classes" table using the Class model
@@ -91,6 +89,7 @@ export const createClass = async (req: Request, res: Response) => {
     const newClass = await Class.create({
       name,
       code: newCode,
+      section
     });
     // Associate the professor who created the class with it
     const professorEmail = email; // We assume that the professor is authenticated, and their information is available in req.user

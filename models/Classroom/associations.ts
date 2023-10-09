@@ -15,8 +15,8 @@ import { StudentClass, initModel as initStudentClass } from "./student_class";
 import { Person, initModel as initPerson } from "../person";
 import { Professor, initModel as initProfessor } from "../professor";
 import { Student, initModel as initStudent } from "../student";
-import { Reminder, initModel as initReminder } from "../reminder"; 
-import { Notification, initModel as initNotification } from "../notification"; 
+import { Reminder, initModel as initReminder } from "../reminder";
+import { Notification, initModel as initNotification } from "../notification";
 
 export const initializeModels = async () => {
   // Initialize all models
@@ -30,7 +30,7 @@ export const initializeModels = async () => {
     await initActivityStudents(db);
     await initProfessorClass(db);
     await initStudentClass(db);
-    await initReminder(db); 
+    await initReminder(db);
     await initNotification(db);
   } catch (error) {
     console.log(error);
@@ -62,7 +62,7 @@ export const configureAssociations = () => {
     targetKey: "email",
   });
 
-  // A professor can teach multiple classes, so we establish a many-to-many relationship 
+  // A professor can teach multiple classes, so we establish a many-to-many relationship
   // between the Professor and Class models using the ProfessorClass as the junction table.
   Professor.belongsToMany(Class, {
     through: ProfessorClass,
@@ -77,7 +77,7 @@ export const configureAssociations = () => {
     targetKey: "email",
   });
 
-  // A student can enroll in multiple classes, so we establish a many-to-many relationship 
+  // A student can enroll in multiple classes, so we establish a many-to-many relationship
   // between the Student and Class models using the StudentClass as the junction table.
   Student.belongsToMany(Class, {
     through: StudentClass,
@@ -99,24 +99,28 @@ export const configureAssociations = () => {
   });
 
   // --- CLASS ASSOCIATIONS ---
-  // A class can have multiple professors, so we establish the relationship.
-  Class.belongsToMany(Professor, {
-    through: ProfessorClass,
-    foreignKey: "ClassId",
-    otherKey: "ProfessorEmail",
-  });
+  // ...
 
-  // Similarly, a class can have multiple students.
-  Class.belongsToMany(Student, {
-    through: StudentClass,
-    foreignKey: "ClassId",
-    otherKey: "StudentEmail",
-  });
-
-  // A class can have multiple activities, so we link the Class model to the ActivityClass model.
-  Class.hasMany(ActivityClass, {
+  // A class can have multiple student associations (through StudentClass)
+  Class.hasMany(StudentClass, {
     foreignKey: "ClassId",
     sourceKey: "id",
+  });
+
+  StudentClass.belongsTo(Class, {
+    foreignKey: "ClassId",
+    targetKey: "id",
+  });
+
+  // Similarly for ProfessorClass
+  Class.hasMany(ProfessorClass, {
+    foreignKey: "ClassId",
+    sourceKey: "id",
+  });
+
+  ProfessorClass.belongsTo(Class, {
+    foreignKey: "ClassId",
+    targetKey: "id",
   });
 
   // --- ACTIVITY ASSOCIATIONS ---
@@ -151,57 +155,54 @@ export const configureAssociations = () => {
     foreignKey: "ClassId",
     targetKey: "ClassId",
   });
-    // A Person can have multiple reminders.
-    Person.hasMany(Reminder, {
-      foreignKey: "personEmail",
-      sourceKey: "email",
-    });
-  
-    // --- REMINDER ASSOCIATIONS ---
-    Reminder.belongsTo(Person, {
-      foreignKey: "personEmail",
-      targetKey: "email",
-    });
-  
-    // --- NOTIFICATION ASSOCIATIONS ---
-    Notification.belongsTo(ActivityClass, {
-      foreignKey: "ActivityClassId",
-      targetKey: "id",
-    });
-  
-    Notification.belongsTo(Reminder, {
-      foreignKey: "ReminderId",
-      targetKey: "id",
-    });
-    // --- ACTIVITY ASSOCIATIONS ---
-    Activity.hasMany(ActivityClass, {
-      foreignKey: "ActivityId",
-      sourceKey: "id",
-    });
-  
-    Activity.hasMany(ActivityStudents, {
-      foreignKey: "ActivityId",
-      sourceKey: "id",
-    });
-  
-    ActivityClass.belongsTo(Activity, {
-      foreignKey: "ActivityId",
-      targetKey: "id",
-    });
-    ActivityClass.belongsTo(Class, {
-      foreignKey: "ClassId",
-      targetKey: "id",
-    });
-  
-    ActivityStudents.belongsTo(Activity, {
-      foreignKey: "ActivityId",
-      targetKey: "id",
-    });
-    ActivityStudents.belongsTo(StudentClass, {
-      foreignKey: "ClassId",
-      targetKey: "ClassId",
-    });
-  
+  // A Person can have multiple reminders.
+  Person.hasMany(Reminder, {
+    foreignKey: "personEmail",
+    sourceKey: "email",
+  });
+
+  // --- REMINDER ASSOCIATIONS ---
+  Reminder.belongsTo(Person, {
+    foreignKey: "personEmail",
+    targetKey: "email",
+  });
+
+  // --- NOTIFICATION ASSOCIATIONS ---
+  Notification.belongsTo(ActivityClass, {
+    foreignKey: "ActivityClassId",
+    targetKey: "id",
+  });
+
+  Notification.belongsTo(Reminder, {
+    foreignKey: "ReminderId",
+    targetKey: "id",
+  });
+  // --- ACTIVITY ASSOCIATIONS ---
+  Activity.hasMany(ActivityClass, {
+    foreignKey: "ActivityId",
+    sourceKey: "id",
+  });
+
+  Activity.hasMany(ActivityStudents, {
+    foreignKey: "ActivityId",
+    sourceKey: "id",
+  });
+
+  ActivityClass.belongsTo(Activity, {
+    foreignKey: "ActivityId",
+    targetKey: "id",
+  });
+  ActivityClass.belongsTo(Class, {
+    foreignKey: "ClassId",
+    targetKey: "id",
+  });
+
+  ActivityStudents.belongsTo(Activity, {
+    foreignKey: "ActivityId",
+    targetKey: "id",
+  });
+  ActivityStudents.belongsTo(StudentClass, {
+    foreignKey: "ClassId",
+    targetKey: "ClassId",
+  });
 };
-
-
