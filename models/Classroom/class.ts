@@ -1,17 +1,18 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 
 class Class extends Model {
-    public id!: number;
+    public id!: string;  // Change the type to string for UUID
     public name!: string;
     public code!: string;
+    public section!: string;
 }
 
 const initModel = (sequelize: Sequelize) => {
     Class.init({
         id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
-            autoIncrement: true,
         },
         name: {
             type: DataTypes.STRING,
@@ -21,7 +22,7 @@ const initModel = (sequelize: Sequelize) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        section:{
+        section: {
             type: DataTypes.STRING,
             allowNull: false,
         }

@@ -16,7 +16,7 @@ const initModel = (sequelize: Sequelize) => {
             }
         },
         ClassId: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
             references: {
                 model: 'class',
                 key: 'id'
