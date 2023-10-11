@@ -54,14 +54,14 @@ export const createAiActivity = async (req: Request, res: Response) => {
 export const createActivity = async (req: Request, res: Response) => {
   try {
     // Extract necessary data from the request body
-    const { name, description, Skills, Time } = req.body;
-
+    const { name, description, Skills, Time, generatedActivity } = req.body;
     // Create a new activity using the provided data
     const newActivity = await Activity.create({
       name,
       description,
       Skills,
       Time,
+      generatedActivity,
     });
 
     // Respond with the newly created activity
@@ -166,7 +166,7 @@ export const getActivityById = async (req: Request, res: Response) => {
 };
 
 export const createActivityWithAssignment = async (req: Request, res: Response) => {
-  const { id, name, description, Skills, Time, DateToComplete, classId } = req.body;
+  const { id, name, description, Skills, Time, DateToComplete, classId, generatedActivity } = req.body;
 
   const transaction = await sequelize.transaction(); // Iniciar una transacción
 
@@ -187,6 +187,7 @@ export const createActivityWithAssignment = async (req: Request, res: Response) 
           Skills,
           Time,
           DateToComplete,
+          generatedActivity,
         },
         { transaction } // Especificar la transacción
       );

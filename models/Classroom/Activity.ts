@@ -31,6 +31,10 @@ const initModel = (sequelize: Sequelize) => {
             type: DataTypes.STRING,
             allowNull: true,
         },
+        generatedActivity:{
+            type: DataTypes.TEXT,
+            allowNull: true
+        }
     }, {
         tableName: 'activity',
         sequelize: sequelize,
