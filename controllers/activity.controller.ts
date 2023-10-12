@@ -307,3 +307,11 @@ export const updateStudentGrades = async (req: Request, res: Response) => {
     res.status(500).json({ msg: "Error del servidor" });
   }
 };
+export const getStudentActivityById = async(req:Request, res:Response) =>{
+  const { activityId } = req.params;
+  const activityClass = await ActivityClass.findByPk(activityId, {
+    include: [StudentClass]  // Esto incluirá los StudentClass asociados en el resultado
+});
+
+return activityClass;
+}

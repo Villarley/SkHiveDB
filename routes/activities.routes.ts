@@ -11,6 +11,7 @@ import {
   getActivitiesByClassId,
   updateStudentGrades,
   createAiActivity,
+  getStudentActivityById,
 } from "../controllers/activity.controller"; 
 
 const router = Router();
@@ -18,6 +19,8 @@ const router = Router();
 // Get All activities
 router.get("/", getActivities);
 
+// Get an activity by its ID
+router.get("studentActivity/:activityId", getStudentActivityById);
 // Obtain activity by id
 router.get("/:id", getActivityById);
 
