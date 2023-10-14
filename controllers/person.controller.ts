@@ -150,3 +150,20 @@ export const deactivatePerson = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Error al desactivar la persona" });
   }
 };
+export const createStudents = async(req:Request, res: Response) => {
+  const students = req.body;
+  console.log(students);
+  try {
+    if(students && students.length > 0){
+      const formattedStudents = [];
+      const createdPerson = await Person.bulkCreate(students);
+      const createdStudents = await Student.bulkCreate(students);
+      res.json({data:createdStudents});
+    }else{
+      res.json({msg:"No hay estudiantes para añadir"});
+    }
+    
+  } catch (error) {
+    console.error("Error al añadir los estudiantes", error)
+  }
+}

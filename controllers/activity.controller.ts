@@ -7,6 +7,8 @@ import {ActivityStudents} from "../models/Classroom/ActivityStudent";
 import axios from "axios";
 import OpenAI from "openai";
 import dotenv from "dotenv";
+import { where } from "sequelize";
+import { Person } from "../models/person";
 
 dotenv.config();
 // Create a new activity with chatGPT
@@ -189,7 +191,7 @@ export const createActivityWithAssignment = async (req: Request, res: Response) 
           DateToComplete,
           generatedActivity,
         },
-        { transaction } // Especificar la transacción
+        { transaction } 
       );
     }
 
@@ -199,7 +201,7 @@ export const createActivityWithAssignment = async (req: Request, res: Response) 
         ActivityId: existingActivity.id,
         ClassId: classId,
       },
-      transaction, // Especificar la transacción
+      transaction,
     });
 
     if (!isAssigned) {
@@ -210,28 +212,39 @@ export const createActivityWithAssignment = async (req: Request, res: Response) 
           ClassId: classId,
           DateToComplete,
         },
-        { transaction } // Especificar la transacción
+        { transaction } 
       );
     }
 
-    // Obtener estudiantes en la clase desde ActivityClass
+    // Obtener estudiantes en la clase desde StudentClass
     const studentsInClass = await StudentClass.findAll({
       where: {
         ClassId: classId,
       },
-      transaction, // Especificar la transacción
+      transaction,
     });
+
     // Crear entradas en ActivityStudent para cada estudiante
     const studentActivityPromises = studentsInClass.map(async (student) => {
-      console.log(student.ClassId);
-      await ActivityStudents.create(
-        {
+      const exists = await ActivityStudents.findOne({
+        where: {
           ActivityId: existingActivity.id,
           ClassId: student.ClassId,
-          grade: null,
         },
-        { transaction } // Especificar la transacción
-      );
+        transaction
+      });
+
+      // Si no existe, crear una nueva entrada
+      if (!exists) {
+        await ActivityStudents.create(
+          {
+            ActivityId: existingActivity.id,
+            ClassId: student.ClassId,
+            grade: null,
+          },
+          { transaction }
+        );
+      }
     });
 
     // Ejecutar todas las promesas de studentActivityPromises concurrentemente
@@ -246,6 +259,7 @@ export const createActivityWithAssignment = async (req: Request, res: Response) 
     res.status(500).json({ msg: "Error del servidor" });
   }
 };
+
 
 // Get activities by class ID
 export const getActivitiesByClassId = async (req: Request, res: Response) => {
@@ -308,10 +322,44 @@ export const updateStudentGrades = async (req: Request, res: Response) => {
   }
 };
 export const getStudentActivityById = async(req:Request, res:Response) =>{
-  const { activityId } = req.params;
-  const activityClass = await ActivityClass.findByPk(activityId, {
-    include: [StudentClass]  // Esto incluirá los StudentClass asociados en el resultado
-});
+  const { activityId, classId } = req.params;
+  try {
+    const studentClasses = await StudentClass.findOne({where: {ActivityId: activityId, ClassId: classId}});
+    console.log(studentClasses);
+    res.json(studentClasses);
+  } catch (error) {
+    res.json({msg:"No fue posible encontrar los estudiantes de esta clase"})
+    console.error(error);
+  }
 
-return activityClass;
+}
+export const getActivityStudentsByActivityId = async(req: Request, res: Response) => {
+  const { activityId } = req.params;
+  
+  try {
+    const allActivityStudents = await ActivityStudents.findAll({where: {ActivityId: activityId}});
+    
+    // Mapear a través de los ActivityStudents y obtener el StudentEmail asociado
+    const activityStudentsWithAssociatedEmails = await Promise.all(allActivityStudents.map(async (activityStudent: any) => {
+      const studentEmailObj:any = await StudentClass.findOne({
+        attributes: ['StudentEmail'],
+        where: { ClassId: activityStudent.ClassId }
+      });
+      const studentDetails = await Person.findByPk(studentEmailObj.StudentEmail, {
+        //excluding unnecesary info
+        attributes: { exclude: ['google', 'state', 'password'] }
+      });
+      
+      return {
+        ...activityStudent.get(),  // Esto obtendrá todos los atributos del modelo como un objeto plano
+        StudentEmail: studentEmailObj?.StudentEmail,
+        studentDetails  // Esto adjunta el correo electrónico asociado
+      };
+    }));
+    
+    res.json({activityStudents: activityStudentsWithAssociatedEmails});
+  } catch (error) { 
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 }

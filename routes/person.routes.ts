@@ -8,6 +8,7 @@ import {
   deletePerson,
   putPerson,
   deactivatePerson,
+  createStudents,
 } from "../controllers/person.controller";
 
 const router = Router();
@@ -41,6 +42,8 @@ router.delete(
   ],
   deactivatePerson
 );
+
+router.post("/createStudents", createStudents);
 
 export default router;
 // Ruta para obtener una persona por su ID:
