@@ -297,8 +297,7 @@ export const getActivitiesByClassId = async (req: Request, res: Response) => {
 
 // Update grades for a student in an activity
 export const updateStudentGrades = async (req: Request, res: Response) => {
-  const { ClassId, ActivityId, grade } = req.body;
-  console.log(req.body)
+  const { ClassId, ActivityId, grade, feedBack } = req.body;
   try {
     // Find the entry in ActivityStudents based on ClassId and ActivityId
     const activityStudent = await ActivityStudents.findOne({
@@ -313,9 +312,9 @@ export const updateStudentGrades = async (req: Request, res: Response) => {
     } 
 
     // Update the grade field with the provided grade data
-    await activityStudent.update({ grade });
+    await activityStudent.update({ grade, feedBack });
 
-    res.json({ msg: "Calificaciones del estudiante actualizadas exitosamente" });
+    res.json({ msg: "Calificaciones del estudiante actualizadas exitosamente",  });
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Error del servidor" });
@@ -349,7 +348,6 @@ export const getActivityStudentsByActivityId = async(req: Request, res: Response
         //excluding unnecesary info
         attributes: { exclude: ['google', 'state', 'password'] }
       });
-      
       return {
         ...activityStudent.get(),  // Esto obtendrá todos los atributos del modelo como un objeto plano
         StudentEmail: studentEmailObj?.StudentEmail,
@@ -357,7 +355,7 @@ export const getActivityStudentsByActivityId = async(req: Request, res: Response
       };
     }));
     
-    res.json({activityStudents: activityStudentsWithAssociatedEmails});
+    res.json(activityStudentsWithAssociatedEmails);
   } catch (error) { 
     console.error(error);
     res.status(500).json({ error: "Internal server error" });

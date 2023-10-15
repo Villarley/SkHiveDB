@@ -25,6 +25,10 @@ const initModel = (sequelize: Sequelize) => {
             type: DataTypes.JSON,
             allowNull: true,
         },
+        feedBack:{
+            type: DataTypes.STRING,
+            allowNull: true,
+        }
     }, {
         tableName: 'activity_students',
         sequelize: sequelize,

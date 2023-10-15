@@ -42,7 +42,7 @@ class Server{
             //sync the models
             await initializeModels();
             await configureAssociations();
-            await db.sync({force: true});
+            await db.sync();
             //Configuring associations
             console.log('DB online')
         }catch(error){
