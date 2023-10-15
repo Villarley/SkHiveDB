@@ -230,20 +230,23 @@ export const createActivityWithAssignment = async (req: Request, res: Response) 
         where: {
           ActivityId: existingActivity.id,
           ClassId: student.ClassId,
+          StudentEmail: student.StudentEmail // Asume que StudentClass tiene un campo StudentEmail
         },
         transaction
       });
 
       // Si no existe, crear una nueva entrada
       if (!exists) {
-        await ActivityStudents.create(
+        const activityStudents = await ActivityStudents.create(
           {
             ActivityId: existingActivity.id,
             ClassId: student.ClassId,
+            StudentEmail: student.StudentEmail,
             grade: null,
           },
           { transaction }
         );
+        console.log(activityStudents);
       }
     });
 
@@ -259,6 +262,7 @@ export const createActivityWithAssignment = async (req: Request, res: Response) 
     res.status(500).json({ msg: "Error del servidor" });
   }
 };
+
 
 
 // Get activities by class ID
@@ -297,15 +301,11 @@ export const getActivitiesByClassId = async (req: Request, res: Response) => {
 
 // Update grades for a student in an activity
 export const updateStudentGrades = async (req: Request, res: Response) => {
-  const { ClassId, ActivityId, grade, feedBack } = req.body;
+  const { activityStudentId } = req.params;
+  const { grade, feedBack } = req.body;
   try {
     // Find the entry in ActivityStudents based on ClassId and ActivityId
-    const activityStudent = await ActivityStudents.findOne({
-      where: {
-        ClassId,
-        ActivityId,
-      },
-    });
+    const activityStudent = await ActivityStudents.findByPk(activityStudentId);
 
     if (!activityStudent) {
       return res.status(404).json({ msg: "Estudiante en actividad no encontrado" });
@@ -336,21 +336,18 @@ export const getActivityStudentsByActivityId = async(req: Request, res: Response
   const { activityId } = req.params;
   
   try {
-    const allActivityStudents = await ActivityStudents.findAll({where: {ActivityId: activityId}});
-    
+    const allActivityStudents = await ActivityStudents.findAll({
+      where: {ActivityId: activityId},
+    });
+
     // Mapear a través de los ActivityStudents y obtener el StudentEmail asociado
     const activityStudentsWithAssociatedEmails = await Promise.all(allActivityStudents.map(async (activityStudent: any) => {
-      const studentEmailObj:any = await StudentClass.findOne({
-        attributes: ['StudentEmail'],
-        where: { ClassId: activityStudent.ClassId }
-      });
-      const studentDetails = await Person.findByPk(studentEmailObj.StudentEmail, {
-        //excluding unnecesary info
+      const studentDetails = await Person.findByPk(activityStudent.StudentEmail, {
+        //excluding unnecessary info
         attributes: { exclude: ['google', 'state', 'password'] }
       });
       return {
         ...activityStudent.get(),  // Esto obtendrá todos los atributos del modelo como un objeto plano
-        StudentEmail: studentEmailObj?.StudentEmail,
         studentDetails  // Esto adjunta el correo electrónico asociado
       };
     }));

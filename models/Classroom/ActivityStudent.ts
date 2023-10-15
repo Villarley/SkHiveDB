@@ -25,6 +25,10 @@ const initModel = (sequelize: Sequelize) => {
             type: DataTypes.JSON,
             allowNull: true,
         },
+        StudentEmail:{
+            type:DataTypes.STRING,
+            allowNull: false,
+        },
         feedBack:{
             type: DataTypes.STRING,
             allowNull: true,

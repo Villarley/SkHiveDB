@@ -52,7 +52,7 @@ router.put(
 );
 router.get("/ClassId/:id", getActivitiesByClassId);
 //update grade
-router.post("/ActivityStudent", updateStudentGrades);
+router.post("/ActivityStudent/:activityStudentId", updateStudentGrades);
 // Delete an activity
 router.delete("/:id", deleteActivity);
 
