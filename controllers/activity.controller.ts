@@ -169,7 +169,12 @@ export const getActivityById = async (req: Request, res: Response) => {
 
 export const createActivityWithAssignment = async (req: Request, res: Response) => {
   const { id, name, description, Skills, Time, DateToComplete, classId, generatedActivity } = req.body;
-
+  const formattedGrades = Skills.map((skill:any)=>(
+    {
+      skill,
+      grade: 0,
+    }
+  ))
   const transaction = await sequelize.transaction(); // Iniciar una transacción
 
   try {
@@ -242,7 +247,7 @@ export const createActivityWithAssignment = async (req: Request, res: Response) 
             ActivityId: existingActivity.id,
             ClassId: student.ClassId,
             StudentEmail: student.StudentEmail,
-            grade: null,
+            grade: formattedGrades,
           },
           { transaction }
         );

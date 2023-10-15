@@ -22,7 +22,7 @@ const initModel = (sequelize: Sequelize) => {
             }
         },
         grade: {
-            type: DataTypes.JSON,
+            type: DataTypes.ARRAY(DataTypes.JSON),
             allowNull: true,
         },
         StudentEmail:{
