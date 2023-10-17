@@ -170,6 +170,7 @@ export const getActivityById = async (req: Request, res: Response) => {
 
 export const createActivityWithAssignment = async (req: Request, res: Response) => {
   const { classId, ...activityData } = req.body;
+  console.log(classId)
   try {
     const activityPromises = classId.map((id: string) => ActivitieService.createAndAssignActivity(activityData, id));
     const activities = await Promise.all(activityPromises);
