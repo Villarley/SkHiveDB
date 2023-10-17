@@ -1,10 +1,13 @@
-import { Activity, ActivityClass, ActivityStudents, StudentClass } from '../models/Classroom'; // Asegúrate de importar los modelos correctos
-import sequelize from '../db/connection'; // Asegúrate de importar sequelize correctamente
+import { Activity, ActivityClass, ActivityStudents, StudentClass } from '../models/Classroom';
+import sequelize from '../db/connection'; 
+import { notificationAssignmentTemplate } from '../utils/emailTemplates';
+import { sendEmail } from '../utils/sendEmail';
 
 class ActivityService {
     // Create a new activity and assign it to a class.
     async createAndAssignActivity(data: any, classId: string): Promise<any> {
-        const { name, description, Skills, Time, DateToComplete, generatedActivity } = data;
+        const { name, description, Skills, Time, DateToComplete, generatedActivity, professorEmail } = data;
+        console.log(data)
         const formattedGrades = Skills.map((skill: any) => ({
             skill,
             grade: 0,
@@ -63,6 +66,16 @@ class ActivityService {
                 });
 
                 if (!exists) {
+                    const formattedObjToSendEmail:any = {
+                        professorEmail,
+                        title: existingActivity.name,
+                        description: existingActivity.description,
+                        date: DateToComplete,
+                        personEmail: student.StudentEmail,
+                        classs: student.ClassId,
+                    }
+                    const formattedEmailTemplate = await notificationAssignmentTemplate(formattedObjToSendEmail)
+                    sendEmail(formattedEmailTemplate);
                     return ActivityStudents.create({
                         ActivityId: existingActivity.id,
                         ClassId: student.ClassId,
