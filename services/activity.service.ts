@@ -29,6 +29,7 @@ class ActivityService {
                     Time,
                     DateToComplete,
                     generatedActivity,
+                    createdBy:professorEmail,
                 }, { transaction });
             }
 
@@ -104,6 +105,15 @@ class ActivityService {
     // Delete an activity.
     async deleteActivity(id: number): Promise<void> {
         await Activity.destroy({ where: { id } });
+    }
+    async getActivitiesByProfessor(createdBy: string): Promise<any[]> {
+        try {
+            // Utiliza el modelo Activity para buscar todas las actividades con el campo createdBy especificado
+            const activities = await Activity.findAll({ where: { createdBy: createdBy } });
+            return activities;
+        } catch (error) {
+            throw error;
+        }
     }
 }
 

@@ -57,7 +57,7 @@ export const createAiActivity = async (req: Request, res: Response) => {
 export const createActivity = async (req: Request, res: Response) => {
   try {
     // Extract necessary data from the request body
-    const { name, description, Skills, Time, generatedActivity } = req.body;
+    const { name, description, Skills, Time, generatedActivity, professorEmail } = req.body;
     // Create a new activity using the provided data
     const newActivity = await Activity.create({
       name,
@@ -65,6 +65,7 @@ export const createActivity = async (req: Request, res: Response) => {
       Skills,
       Time,
       generatedActivity,
+      createdBy:professorEmail,
     });
 
     // Respond with the newly created activity
@@ -277,3 +278,14 @@ export const getActivityStudentsByActivityId = async(req: Request, res: Response
     res.status(500).json({ error: "Internal server error" });
   }
 }
+export const getActivitiesByProfessor = async (req: Request, res: Response) => {
+  const { professorEmail } = req.params;
+  try {
+      const activities = await ActivitieService.getActivitiesByProfessor(professorEmail);
+      res.json({ activities, msg: "Actividades recuperadas exitosamente por" });
+  } catch (error) {
+    console.error(error);
+    console.error(professorEmail); 
+      res.status(500).json({ msg: "Error del servidor" });
+  }
+};

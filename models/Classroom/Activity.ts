@@ -6,6 +6,7 @@ class Activity extends Model {
     public description!: string | null;
     public Skills!: string[] | null;
     public Time!: string | null;
+    public createdBy!: string; // <-- Agrega este campo
 }
 
 const initModel = (sequelize: Sequelize) => {
@@ -30,6 +31,10 @@ const initModel = (sequelize: Sequelize) => {
         Time: {
             type: DataTypes.STRING,
             allowNull: true,
+        },
+        createdBy: {
+            type: DataTypes.STRING,
+            allowNull: false,
         },
         generatedActivity:{
             type: DataTypes.TEXT,
