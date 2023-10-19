@@ -150,11 +150,15 @@ export const getActivities = async (req: Request, res: Response) => {
 
 // Get an activity by its ID
 export const getActivityById = async (req: Request, res: Response) => {
-  const activityId = req.params.id;
-
+  const { id:activityId, professorEmail } = req.params;
+  console.log(professorEmail);
   try {
     // Find the activity by its ID
     const activity = await Activity.findByPk(activityId);
+    const remainToProfessor = professorEmail == activity?.createdBy;
+    if(!remainToProfessor){
+      return res.status(404).json({ msg: "Actividad no encontrada" });
+    }
     if (!activity) {
       // If activity is not found, respond with a 404 error
       return res.status(404).json({ msg: "Actividad no encontrada" });
@@ -242,6 +246,7 @@ export const updateStudentGrades = async (req: Request, res: Response) => {
 };
 export const getStudentActivityById = async(req:Request, res:Response) =>{
   const { activityId, classId } = req.params;
+  // console.log("hola")
   try {
     const studentClasses = await StudentClass.findOne({where: {ActivityId: activityId, ClassId: classId}});
     console.log(studentClasses);

@@ -25,7 +25,7 @@ router.get("/activityStudents/:activityId", getActivityStudentsByActivityId);
 // Get an activity by its ID
 router.get("/studentActivity/:activityId/:classId", getStudentActivityById);
 // Obtain activity by id
-router.get("/:id/:professorEmail", getActivityById);
+router.get("/activity/:id/:professorEmail", getActivityById);
 
 router.get("/c/activitiesByProfessor/:professorEmail", getActivitiesByProfessor);
 // Create an activity with gpt model
