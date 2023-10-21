@@ -30,7 +30,7 @@ router.put("/:id", [
   check('email', 'El correo no es válido').isEmail(),
   check('name', 'El nombre es requerido').notEmpty(),
   check('surnames', 'Los apellidos son requeridos').notEmpty(),
-  check('password', 'La contraseña debe tener al menos 6 caracteres').isLength({ min: 6 }),
+  // check('password', 'La contraseña debe tener al menos 6 caracteres').isLength({ min: 6 }),
   validateField
 ], updatePersonWithCodeVerification);
 router.post('/generateCode', generateCodeAndSendEmail); 

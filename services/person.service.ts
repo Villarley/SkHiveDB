@@ -1,21 +1,25 @@
 import { notificationCodeVerification } from "../utils/emailTemplates";
 import { generateRandomCode } from "../utils/generateCode";
 import { sendEmail } from "../utils/sendEmail";
+import { Person } from "../models/person";
 
 class PersonService {
     private verificationCodes = new Map<string, string>();
 
-    async generateAndSendVerificationCode(email: string): Promise<void> {
-        const code = generateRandomCode();
-        console.log(code)
-        this.storeCode(email, code);
-        const formattedEmail = notificationCodeVerification(email, code);
-        sendEmail(formattedEmail);
+    async generateAndSendVerificationCode(email: string): Promise<boolean> {
+        const existingUser = await Person.findByPk(email);
+            if(!existingUser) {
+                return false
+            }
+            const code = generateRandomCode();
+            this.storeCode(email, code);
+            const formattedEmail = notificationCodeVerification(email, code);
+            sendEmail(formattedEmail);
+            return true
     }
 
     verifyCode(email: string, code: string): boolean {
         const storedCode = this.verificationCodes.get(email);
-        // console.log(storedCode);
         if (storedCode === code) {
             this.verificationCodes.delete(email); // Elimina el código una vez verificado
             return true;

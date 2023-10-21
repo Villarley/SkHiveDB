@@ -21,6 +21,13 @@
         Person: PersonDetails;
     };
   }
+  interface StudentClassWithClass extends StudentClass {
+    Class: {
+      name: string;
+      code: string;
+      section: string;
+    };
+  }
   // Controller to get all classes
   export const getClasses = async (req: Request, res: Response) => {
     try {
@@ -256,5 +263,28 @@ export const getClassesByProfessor = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error getting classes by professor:", error);
     res.status(500).json({ msg: "Error getting classes by professor" });
+  }
+};
+export const getClassesByStudent = async (req: Request, res: Response) => {
+  const studentEmail = req.params.studentEmail;
+
+  try {
+      const classes = await StudentClass.findAll({
+          where: { StudentEmail: studentEmail },
+          include: [
+              {
+                  model: Class,
+                  as: "Class",
+                  attributes: ["name", "code", "section"],
+              },
+          ],
+      });
+
+      const formattedClasses = (classes as StudentClassWithClass[]).map(studentClass => studentClass.Class);
+
+      res.json(formattedClasses);
+  } catch (error) {
+      console.error("Error obteniendo clases por estudiante:", error);
+      res.status(500).json({ msg: "Error obteniendo clases por estudiante" });
   }
 };

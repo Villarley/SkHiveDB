@@ -15,7 +15,10 @@ export const generateCodeAndSendEmail = async (req: Request, res: Response) => {
       if (!email) {
           return res.status(400).json({ error: "El correo electrónico es requerido" });
       }
-      await personService.generateAndSendVerificationCode(email);
+      const generatedCode = await personService.generateAndSendVerificationCode(email);
+      if (!generatedCode){
+        return res.status(404).json({message:"Usuario no encontrado"})
+      }
       return res.status(200).json({ message: "Código de verificación enviado. Por favor, verifica tu correo." });
   } catch (error) {
       console.error("Error al generar y enviar el código de verificación:", error);
@@ -118,15 +121,23 @@ export const updatePersonWithCodeVerification = async (req: Request, res: Respon
       person.email = email;
       person.name = name;
       person.surnames = surnames;
-      if (password) {
-          const hashedPassword = await bcrypt.hash(password, 10);
-          person.password = hashedPassword;
-      }
+      if (password && password.trim().length > 0) {
+        if (password.trim().length < 6) {
+            return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres" });
+        }
+        const hashedPassword = await bcrypt.hash(password, 10);
+        person.password = hashedPassword;
+    }    
       person.state = state;
       person.google = google;
       await person.save();
+      const updatedPerson = {
+        name,
+        email,
+        surnames,
+      }
 
-      return res.status(200).json({ message: "Perfil actualizado con éxito" });
+      return res.status(200).json({ updatedPerson, message: "Perfil actualizado con éxito" });
   } catch (error) {
       console.error("Error al actualizar el perfil:", error);
       res.status(500).json({ error: "Error al actualizar el perfil" });
