@@ -2,13 +2,14 @@ import { Request, Response } from "express";
 import {Activity} from "../models/Classroom/Activity"; // Adjust the path to the Activity model
 import {StudentClass} from "../models/Classroom/student_class";
 import {ActivityClass} from "../models/Classroom/ActivityClass"; // Import your ActivityClass model
-import sequelize from '../db/connection';
 import {ActivityStudents} from "../models/Classroom/ActivityStudent";
-import axios from "axios";
+import sequelize from '../db/connection';
+import axios from "axios";  
 import OpenAI from "openai";
 import dotenv from "dotenv";
 import { where } from "sequelize";
 import { Person } from "../models/person";
+import ActivitieService from "../services/activity.service"
 
 dotenv.config();
 // Create a new activity with chatGPT
@@ -56,7 +57,7 @@ export const createAiActivity = async (req: Request, res: Response) => {
 export const createActivity = async (req: Request, res: Response) => {
   try {
     // Extract necessary data from the request body
-    const { name, description, Skills, Time, generatedActivity } = req.body;
+    const { name, description, Skills, Time, generatedActivity, professorEmail } = req.body;
     // Create a new activity using the provided data
     const newActivity = await Activity.create({
       name,
@@ -64,6 +65,7 @@ export const createActivity = async (req: Request, res: Response) => {
       Skills,
       Time,
       generatedActivity,
+      createdBy:professorEmail,
     });
 
     // Respond with the newly created activity
@@ -148,11 +150,15 @@ export const getActivities = async (req: Request, res: Response) => {
 
 // Get an activity by its ID
 export const getActivityById = async (req: Request, res: Response) => {
-  const activityId = req.params.id;
-
+  const { id:activityId, professorEmail } = req.params;
+  console.log(professorEmail);
   try {
     // Find the activity by its ID
     const activity = await Activity.findByPk(activityId);
+    const remainToProfessor = professorEmail == activity?.createdBy;
+    if(!remainToProfessor){
+      return res.status(404).json({ msg: "Actividad no encontrada" });
+    }
     if (!activity) {
       // If activity is not found, respond with a 404 error
       return res.status(404).json({ msg: "Actividad no encontrada" });
@@ -168,101 +174,14 @@ export const getActivityById = async (req: Request, res: Response) => {
 };
 
 export const createActivityWithAssignment = async (req: Request, res: Response) => {
-  const { id, name, description, Skills, Time, DateToComplete, classId, generatedActivity } = req.body;
-  const formattedGrades = Skills.map((skill:any)=>(
-    {
-      skill,
-      grade: 0,
-    }
-  ))
-  const transaction = await sequelize.transaction(); // Iniciar una transacción
-
+  const { classId, ...activityData } = req.body;
+  console.log(classId)
   try {
-    let existingActivity: any;
+    const activityPromises = classId.map((id: string) => ActivitieService.createAndAssignActivity(activityData, id));
+    const activities = await Promise.all(activityPromises);
 
-    // Comprobar si ya existe una actividad existente
-    if (id) {
-      existingActivity = await Activity.findByPk(id);
-    }
-
-    if (!existingActivity) {
-      // Si no existe, crear una nueva actividad
-      existingActivity = await Activity.create(
-        {
-          name,
-          description,
-          Skills,
-          Time,
-          DateToComplete,
-          generatedActivity,
-        },
-        { transaction } 
-      );
-    }
-
-    // Comprobar si la actividad ya está asignada a la clase
-    const isAssigned = await ActivityClass.findOne({
-      where: {
-        ActivityId: existingActivity.id,
-        ClassId: classId,
-      },
-      transaction,
-    });
-
-    if (!isAssigned) {
-      // Si la actividad no está asignada a la clase, crear una entrada en ActivityClass
-      await ActivityClass.create(
-        {
-          ActivityId: existingActivity.id,
-          ClassId: classId,
-          DateToComplete,
-        },
-        { transaction } 
-      );
-    }
-
-    // Obtener estudiantes en la clase desde StudentClass
-    const studentsInClass = await StudentClass.findAll({
-      where: {
-        ClassId: classId,
-      },
-      transaction,
-    });
-
-    // Crear entradas en ActivityStudent para cada estudiante
-    const studentActivityPromises = studentsInClass.map(async (student) => {
-      const exists = await ActivityStudents.findOne({
-        where: {
-          ActivityId: existingActivity.id,
-          ClassId: student.ClassId,
-          StudentEmail: student.StudentEmail // Asume que StudentClass tiene un campo StudentEmail
-        },
-        transaction
-      });
-
-      // Si no existe, crear una nueva entrada
-      if (!exists) {
-        const activityStudents = await ActivityStudents.create(
-          {
-            ActivityId: existingActivity.id,
-            ClassId: student.ClassId,
-            StudentEmail: student.StudentEmail,
-            grade: formattedGrades,
-          },
-          { transaction }
-        );
-        console.log(activityStudents);
-      }
-    });
-
-    // Ejecutar todas las promesas de studentActivityPromises concurrentemente
-    await Promise.all(studentActivityPromises);
-
-    await transaction.commit(); // Confirmar la transacción
-
-    res.status(201).json({ existingActivity, msg: "Actividad creada y asignada exitosamente" });
+    res.status(201).json({ activities, msg: "Actividad creada y asignada exitosamente" });
   } catch (error) {
-    await transaction.rollback(); // Revertir la transacción en caso de error
     console.error(error);
     res.status(500).json({ msg: "Error del servidor" });
   }
@@ -327,6 +246,7 @@ export const updateStudentGrades = async (req: Request, res: Response) => {
 };
 export const getStudentActivityById = async(req:Request, res:Response) =>{
   const { activityId, classId } = req.params;
+  // console.log("hola")
   try {
     const studentClasses = await StudentClass.findOne({where: {ActivityId: activityId, ClassId: classId}});
     console.log(studentClasses);
@@ -363,3 +283,14 @@ export const getActivityStudentsByActivityId = async(req: Request, res: Response
     res.status(500).json({ error: "Internal server error" });
   }
 }
+export const getActivitiesByProfessor = async (req: Request, res: Response) => {
+  const { professorEmail } = req.params;
+  try {
+      const activities = await ActivitieService.getActivitiesByProfessor(professorEmail);
+      res.json({ activities, msg: "Actividades recuperadas exitosamente por" });
+  } catch (error) {
+    console.error(error);
+    console.error(professorEmail); 
+      res.status(500).json({ msg: "Error del servidor" });
+  }
+};

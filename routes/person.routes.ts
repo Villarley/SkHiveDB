@@ -6,9 +6,10 @@ import {
   getPersons,
   postPerson,
   deletePerson,
-  putPerson,
+  updatePersonWithCodeVerification,
   deactivatePerson,
   createStudents,
+  generateCodeAndSendEmail,
 } from "../controllers/person.controller";
 
 const router = Router();
@@ -25,14 +26,15 @@ router.post("/", [
 ], postPerson);
 
 router.put("/:id", [
-  validateJWT,
+  // validateJWT,
   check('email', 'El correo no es válido').isEmail(),
   check('name', 'El nombre es requerido').notEmpty(),
   check('surnames', 'Los apellidos son requeridos').notEmpty(),
-  check('password', 'La contraseña debe tener al menos 6 caracteres').isLength({ min: 6 }),
+  // check('password', 'La contraseña debe tener al menos 6 caracteres').isLength({ min: 6 }),
   validateField
-], putPerson);
-
+], updatePersonWithCodeVerification);
+router.post('/generateCode', generateCodeAndSendEmail); 
+//delete user
 router.delete(
   "/:id",
   [

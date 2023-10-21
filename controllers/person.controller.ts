@@ -6,6 +6,25 @@ import {Student} from "../models/student";
 import {Professor} from "../models/professor";
 import { sendEmail } from "../utils/sendEmail";
 import { welcomeEmailTemplate } from "../utils/emailTemplates";
+import personService from "../services/person.service";
+
+
+export const generateCodeAndSendEmail = async (req: Request, res: Response) => {
+  try {
+      const { email } = req.body;
+      if (!email) {
+          return res.status(400).json({ error: "El correo electrónico es requerido" });
+      }
+      const generatedCode = await personService.generateAndSendVerificationCode(email);
+      if (!generatedCode){
+        return res.status(404).json({message:"Usuario no encontrado"})
+      }
+      return res.status(200).json({ message: "Código de verificación enviado. Por favor, verifica tu correo." });
+  } catch (error) {
+      console.error("Error al generar y enviar el código de verificación:", error);
+      res.status(500).json({ error: "Error al generar y enviar el código de verificación" });
+  }
+};
 
 // Obtener una persona por su ID
 export const getPerson = async (req: Request, res: Response, data: any) => {
@@ -82,33 +101,46 @@ export const postPerson = async (req: Request, res: Response) => {
 };
 
 // Actualizar una persona existente
-export const putPerson = async (req: Request, res: Response) => {
+export const updatePersonWithCodeVerification = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const { email, name, surnames, password, state, google } = req.body;
-    const person = await Person.findByPk(id);
+      const  { id } = req.params;
+      const { email, name, surnames, password, state, google, verificationCode } = req.body;
 
-    if (!person) {
-      return res.status(404).json({ error: "Persona no encontrada" });
-    }
+      // Verificar el código
+      const isValid = personService.verifyCode(email, verificationCode);
+      if (!isValid) {
+          return res.status(400).json({ error: "Código de verificación incorrecto" });
+      }
 
-    person.email = email;
-    person.name = name;
-    person.surnames = surnames;
+      // Actualizar el perfil del usuario
+      const person = await Person.findByPk(id);
+      if (!person) {
+          return res.status(404).json({ error: "Persona no encontrada" });
+      }
 
-    if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      person.password = hashedPassword;
-    }
+      person.email = email;
+      person.name = name;
+      person.surnames = surnames;
+      if (password && password.trim().length > 0) {
+        if (password.trim().length < 6) {
+            return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres" });
+        }
+        const hashedPassword = await bcrypt.hash(password, 10);
+        person.password = hashedPassword;
+    }    
+      person.state = state;
+      person.google = google;
+      await person.save();
+      const updatedPerson = {
+        name,
+        email,
+        surnames,
+      }
 
-    person.state = state;
-    person.google = google;
-    await person.save();
-
-    res.json(person);
+      return res.status(200).json({ updatedPerson, message: "Perfil actualizado con éxito" });
   } catch (error) {
-    console.error("Error al actualizar la persona:", error);
-    res.status(500).json({ error: "Error al actualizar la persona" });
+      console.error("Error al actualizar el perfil:", error);
+      res.status(500).json({ error: "Error al actualizar el perfil" });
   }
 };
 
