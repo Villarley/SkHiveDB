@@ -165,8 +165,8 @@
 
   // Controller to associate a student with a class
   export const addStudentToClass = async (req: Request, res: Response) => {
-    const { studentEmail, classCode } = req.body; // Remove 'classId' as we'll use 'classCode'
-
+    const { studentEmail, classCode } = req.body;
+    console.log(studentEmail);
     try {
       // Check if the class exists using the provided class code
       const classFound = await Class.findOne({
@@ -178,10 +178,9 @@
       });
 
       if (!classFound) {
-        res.status(404).json({ msg: "Class not found" });
+        res.status(404).json({ msg: "Clase no encontrada" });
         return;
       }
-
       // Register the relationship between the student and the class
       await StudentClass.create({
         StudentEmail: studentEmail,
@@ -266,20 +265,18 @@ export const getClassesByProfessor = async (req: Request, res: Response) => {
   }
 };
 export const getClassesByStudent = async (req: Request, res: Response) => {
-  const studentEmail = req.params.studentEmail;
-
+  const { email } = req.params;
   try {
       const classes = await StudentClass.findAll({
-          where: { StudentEmail: studentEmail },
+          where: { StudentEmail: email },
           include: [
               {
                   model: Class,
                   as: "Class",
-                  attributes: ["name", "code", "section"],
+                  attributes: ["name", "code", "section", "id"],
               },
           ],
-      });
-
+      }); 
       const formattedClasses = (classes as StudentClassWithClass[]).map(studentClass => studentClass.Class);
 
       res.json(formattedClasses);

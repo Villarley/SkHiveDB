@@ -40,7 +40,36 @@ class NotificationService {
 
         return notification;
     }
+    async sendNotification(data: any): Promise<Notification> {
+        const notification = await Notification.create(data);
+        const { title, description, date, tokenDevice, personEmail } = data;
 
+        const timezone = 'America/Costa_Rica';
+
+        const currentDate = moment.tz(timezone);
+        const scheduledDate = moment.tz(date, timezone);
+
+        // Check if the scheduled date is in the future
+        console.log(scheduledDate,currentDate);
+        if (scheduledDate.isAfter(currentDate)) {
+            //formatting the email
+            // Convert the scheduled date to a cron expression
+            const cronExpression = `${scheduledDate.minute()} ${scheduledDate.hour()} ${scheduledDate.date()} ${scheduledDate.month() + 1} *`;
+    
+            cron.schedule(cronExpression, async () => {
+                if (tokenDevice) {
+                    await fcmService.sendNotification(tokenDevice, title, description);
+                }
+            });
+        } else {
+            // Send the notification immediately if the date is not in the future
+            if (tokenDevice) {
+                await fcmService.sendNotification(tokenDevice, title, description);
+            }
+        }
+
+        return notification;
+    }
     // Update an existing notification.
     async updateNotification(id: number, data: any): Promise<Notification | null> {
         await Notification.update(data, { where: { id } });

@@ -14,6 +14,7 @@ import {
   getStudentActivityById,
   getActivityStudentsByActivityId,
   getActivitiesByProfessor,
+  getActivitiesByStudentClass,
 } from "../controllers/activity.controller"; 
 
 const router = Router();
@@ -57,6 +58,8 @@ router.get("/ClassId/:id", getActivitiesByClassId);
 router.post("/ActivityStudent/:activityStudentId", updateStudentGrades);
 // Delete an activity
 router.delete("/:id", deleteActivity);
+//Getting all the activities
+router.get("/studentActivities/:email/:classId", getActivitiesByStudentClass)
 
 
 

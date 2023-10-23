@@ -294,3 +294,30 @@ export const getActivitiesByProfessor = async (req: Request, res: Response) => {
       res.status(500).json({ msg: "Error del servidor" });
   }
 };
+export const getActivitiesByStudentClass = async(req:Request, res:Response) => {
+  const { classId, email } = req.params;
+  try {
+    const activities = await ActivityStudents.findAll({
+        where: { StudentEmail: email },
+        include: [
+            {
+                model: Activity,
+                as: "Activity",
+                include: [
+                    {
+                        model: ActivityClass,
+                        where: { ClassId: classId },
+                        required: true
+                    }
+                ]
+            }
+        ]
+    });
+
+    res.json(activities);
+  } catch (error) {
+    console.error("Error obteniendo actividades por estudiante y clase:", error);
+    res.status(500).json({ msg: "Error obteniendo actividades por estudiante y clase" });
+  }
+}
+  

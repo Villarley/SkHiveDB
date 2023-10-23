@@ -11,6 +11,7 @@ import {
   addStudentToClass,
   getStudentsInClass,
   getClassesByProfessor,
+  getClassesByStudent,
 } from "../controllers/class.controller"; // Functions
 
 const router = Router();
@@ -53,5 +54,8 @@ router.post("/add-student", addStudentToClass);
 router.get("/students/:id", getStudentsInClass);
 // Getting all the classes that remains to a professor
 router.get("/professor/:id/:cuantity", getClassesByProfessor);
+// Getting all the classes where a student is in them
+router.get("/studentClasses/:email", getClassesByStudent);
+
 
 export default router;
