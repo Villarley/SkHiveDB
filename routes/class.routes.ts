@@ -12,6 +12,7 @@ import {
   getStudentsInClass,
   getClassesByProfessor,
   getClassesByStudent,
+  deleteStudentClass,
 } from "../controllers/class.controller"; // Functions
 
 const router = Router();
@@ -45,7 +46,7 @@ router.put(
 );
 
 // Eliminating Class
-router.delete("/:id", deleteClass);
+// router.delete("/:id", deleteClass);
 
 // Adding a student to a class
 router.post("/add-student", addStudentToClass);
@@ -56,6 +57,7 @@ router.get("/students/:id", getStudentsInClass);
 router.get("/professor/:id/:cuantity", getClassesByProfessor);
 // Getting all the classes where a student is in them
 router.get("/studentClasses/:email", getClassesByStudent);
+router.delete("/deleteStudentClass", deleteStudentClass);
 
 
 export default router;

@@ -9,6 +9,7 @@
   //Util functions
   import { generateRandomCode } from "../utils/generateCode";
   import { Person } from "../models/person";
+import classService from "../services/class.service";
 
   interface PersonDetails {
     name: string;
@@ -285,3 +286,14 @@ export const getClassesByStudent = async (req: Request, res: Response) => {
       res.status(500).json({ msg: "Error obteniendo clases por estudiante" });
   }
 };
+export const deleteStudentClass = async(req:Request, res:Response) => {
+  const { studentEmail, classId } = req.body;
+  console.log(studentEmail, classId);
+  try {
+    const result = await classService.deleteStudentClass(studentEmail, classId);
+    res.json(result);
+  } catch (error:any) {
+    console.error("Error eliminando el estudiante de la clase:", error);
+    res.status(500).json({ msg: error.message });
+  }
+}
