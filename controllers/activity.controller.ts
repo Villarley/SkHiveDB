@@ -229,7 +229,7 @@ export const updateStudentGrades = async (req: Request, res: Response) => {
   const { grade, feedBack } = req.body;
   try {
     // Find the entry in ActivityStudents based on ClassId and ActivityId
-    const activityStudent = await ActivityStudents.findByPk(activityStudentId);
+    const activityStudent:any = await ActivityStudents.findByPk(activityStudentId);
 
     if (!activityStudent) {
       return res.status(404).json({ msg: "Estudiante en actividad no encontrado" });
@@ -237,6 +237,7 @@ export const updateStudentGrades = async (req: Request, res: Response) => {
 
     // Update the grade field with the provided grade data
     await activityStudent.update({ grade, feedBack });
+    console.log(activityStudent);
 
     res.json({ msg: "Calificaciones del estudiante actualizadas exitosamente",  });
   } catch (error) {
@@ -318,6 +319,16 @@ export const getActivitiesByStudentClass = async(req:Request, res:Response) => {
   } catch (error) {
     console.error("Error obteniendo actividades por estudiante y clase:", error);
     res.status(500).json({ msg: "Error obteniendo actividades por estudiante y clase" });
+  }
+}
+export const getStudentActivityByEmail = async(req:Request, res:Response) => {
+  const { StudentEmail, ActivityId } = req.params;
+  try {
+    const studentActivity = await ActivityStudents.findOne({where: { StudentEmail, ActivityId}, include: [Activity]});
+    res.json(studentActivity);
+  } catch (error) {
+    console.error(error)
+    res.sendStatus(500).json({msg:"Ocurrio un error al obtener la actividad de este usuario."})
   }
 }
   
