@@ -66,6 +66,7 @@ export const createActivity = async (req: Request, res: Response) => {
       Time,
       generatedActivity,
       createdBy:professorEmail,
+      favorite:false,
     });
 
     // Respond with the newly created activity
@@ -329,6 +330,21 @@ export const getStudentActivityByEmail = async(req:Request, res:Response) => {
   } catch (error) {
     console.error(error)
     res.sendStatus(500).json({msg:"Ocurrio un error al obtener la actividad de este usuario."})
+  }
+}
+export const updateFavoriteActivity = async(req:Request, res:Response) =>{
+  const { activityId } = req.params;
+  const { favorite } = req.body;
+  try {
+    const activity:any= await Activity.findByPk(activityId);
+    if(!activity)   {
+      res.status(404).json({msg:"No se encontró la actividad"})
+    }
+    activity.favorite = favorite;
+    await activity.save();
+  }catch (error) {
+    console.error(error);
+    throw new Error;
   }
 }
   

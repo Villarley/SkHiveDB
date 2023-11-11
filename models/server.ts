@@ -12,6 +12,7 @@ import remindersRoutes from "../routes/reminders.routes"
 //initializations:
 import { configureAssociations, initializeModels } from './Classroom/associations';
 import "../config/firebaseConfig";
+import cookieParser from "cookie-parser"
 
 class Server{
     private app: Application;
@@ -32,6 +33,7 @@ class Server{
         //configurar mis rutas
         this.dbConnection();
         this.middlewares();
+        this.app.use(cookieParser());
         this.routes();
     }
 

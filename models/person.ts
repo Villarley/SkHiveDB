@@ -35,6 +35,10 @@ const initModel = (sequelize: Sequelize) => {
             type: DataTypes.BOOLEAN,
             defaultValue: true,
         },
+        img:{
+            type: DataTypes.STRING,
+            allowNull:true,
+        }
     }, {
         timestamps: false,
         tableName: 'person',

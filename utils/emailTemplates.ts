@@ -79,7 +79,7 @@ export const notificationAssignmentTemplate = (data: notificationAssignmentData)
         <td style="padding: 20px;">                
           <h1 style="color: #6F3BFF;">${title}</h1>
           <p style="color: #333; font-size: 16px; line-height: 1.6;">Fecha de entrega: ${date}</p>
-          <p style="color: #333; font-size: 16px; line-height: 1.6;">Profesor: ${professorInfo.name} (${professorEmail})</p>
+          <p style="color: #333; font-size: 16px; line-height: 1.6;">Profesor: (${professorEmail})</p>
           <p style="color: #333; font-size: 16px; line-height: 1.6;">Clase: ${classs}</p>
           <p style="color: #333; font-size: 16px; line-height: 1.6;">Haz clic en el botón a continuación para acceder a tu panel de control:</p>
           <a href="http://localhost:3000/dashboard" style="display: inline-block; padding: 10px 20px; color: #ffffff; background-color: #6F3BFF; border-radius: 5px; text-decoration: none;">Ir al Dashboard</a>

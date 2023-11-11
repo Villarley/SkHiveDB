@@ -7,7 +7,7 @@ import {Professor} from "../models/professor";
 import { sendEmail } from "../utils/sendEmail";
 import { welcomeEmailTemplate } from "../utils/emailTemplates";
 import personService from "../services/person.service";
-
+import activityService from "../services/activity.service";
 
 export const generateCodeAndSendEmail = async (req: Request, res: Response) => {
   try {
@@ -58,6 +58,51 @@ export const getPersons = async (req: Request, res: Response) => {
 export const postPerson = async (req: Request, res: Response) => {
   try {
     const { email, name, surnames, password, role, google } = req.body;
+    const activities = [
+      {
+        name: "Presentación por parejas",
+        description: "El primer día de clases, el docente asignará parejas aleatorias. Cada pareja tendrá 5 minutos para conversar entre ellos y luego presentarán a su compañero ante la clase, destacando 3 cosas interesantes que hayan aprendido sobre él.",
+        Skills: ["Escucha activa", "Comunicación efectiva", "Adaptabilidad",],
+        Time: "10 minutos",
+        createdBy: email,
+        generatedActivity: "Descripción adicional si es necesario"
+      },
+      {
+        name: "Canasta revuelta",
+        description: "Todos los estudiantes se formarán en un círculo. Uno de ellos iniciará diciendo su nombre y mostrando una seña particular (ej. tocar la nariz). El siguiente estudiante dirá el nombre del anterior, hará su seña y añadirá la suya, y así sucesivamente. El objetivo es recordar todas las señas anteriores.",
+        Skills: ["Concentración", "Comunicación", "Trabajo en equipo", "Gestión de presión"],
+        Time: "15 minutos",
+        createdBy: email,
+        generatedActivity: "Descripción adicional si es necesario"
+      },
+      {
+        name: "Alto y Siga",
+        description: "Se divide al grupo en 4 grupos, cada uno con una actividad diferente. A la señal, todos comienzan a realizar su actividad. Cuando el docente grita '¡Alto!', todos se detienen y escuchan. A la siguiente señal '¡Siga!', los estudiantes rotan a la siguiente actividad.",
+        Skills: ["Trabajo en equipo", "Toma de decisiones", "Orientación a resultados", "Adaptabilidad"],
+        Time: "20 minutos",
+        createdBy: email,
+        generatedActivity: "Descripción adicional si es necesario"
+      },
+      {
+        name: "La entrevista",
+        description: "Se divide al grupo en parejas. Una persona es el entrevistador y la otra es el entrevistado. El entrevistador tiene 5 minutos para aprender todo lo que puede sobre el entrevistado. Luego, se invierten los roles. Al final, cada entrevistador presenta a su pareja al grupo.",
+        Skills: ["Escucha activa", "Comunicación", "Adaptabilidad", "Empatía"],
+        Time: "15 minutos",
+        createdBy: email,
+        generatedActivity: "Descripción adicional si es necesario"
+      },
+      {
+        name: "Construye una historia",
+        description: "Cada estudiante dice una frase para construir una historia. Por ejemplo, el primero dice 'Había una vez un dragón que vivía en un castillo'. El siguiente podría decir 'Este dragón amaba coleccionar zapatos'. Y así sucesivamente. El objetivo es construir una historia cohesiva y creativa.",
+        Skills: ["Creatividad", "Escucha activa", "Trabajo en equipo", "Comunicación"],
+        Time: "15 minutos",
+        createdBy: email,
+        generatedActivity: "Descripción adicional si es necesario"
+      },
+      // ... Continúa con las demás actividades
+    ];
+
+    
 
     const existingPerson = await Person.findByPk(email);
     if(!existingPerson) {
@@ -79,6 +124,9 @@ export const postPerson = async (req: Request, res: Response) => {
       if (role === "student") {
         newRole = await Student.create({ email });
       } else if (role === "professor" || role ===undefined || role ===null  ) {
+        activities.map((activity)=>(
+          activityService.createActivity(activity)
+        ))
         newRole = await Professor.create({ email });
       }
       const dataEmail = {

@@ -4,6 +4,28 @@ import { notificationAssignmentTemplate } from '../utils/emailTemplates';
 import { sendEmail } from '../utils/sendEmail';
 
 class ActivityService {
+    async createActivity(data: any): Promise<any> {
+        const { name, description, Skills, Time, createdBy } = data;
+        const transaction = await sequelize.transaction();
+    
+        try {
+            const createdActivity = await Activity.create({
+                name,
+                description,
+                Skills,
+                Time,
+                createdBy,
+                favorite:false,
+            }, { transaction });
+    
+            await transaction.commit();
+            return createdActivity;
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
+    }
+    
     // Create a new activity and assign it to a class.
     async createAndAssignActivity(data: any, classId: string): Promise<any> {
         const { name, description, Skills, Time, DateToComplete, generatedActivity, professorEmail } = data;
@@ -30,6 +52,7 @@ class ActivityService {
                     DateToComplete,
                     generatedActivity,
                     createdBy:professorEmail,
+                    favorite:false,
                 }, { transaction });
             }
 

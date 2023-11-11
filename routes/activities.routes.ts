@@ -16,6 +16,7 @@ import {
   getActivitiesByProfessor,
   getActivitiesByStudentClass,
   getStudentActivityByEmail,
+  updateFavoriteActivity,
 } from "../controllers/activity.controller"; 
 
 const router = Router();
@@ -44,6 +45,8 @@ router.post(
 );
 
 router.post("/assign", createActivityWithAssignment);
+//Update favorite
+router.post("/updateFavoriteActivity/:activityId", updateFavoriteActivity);
 // Update an activity
 router.put(
   "/:id",

@@ -14,6 +14,7 @@ import {
   getClassesByStudent,
   deleteStudentClass,
 } from "../controllers/class.controller"; // Functions
+import { validateJWT } from "../middlewares/validate-jwt";
 
 const router = Router();
 
