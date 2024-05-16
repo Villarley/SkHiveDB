@@ -1,0 +1,50 @@
+name: Auto Labeler
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Add label based on branch name
+      run: |
+        BRANCH_NAME=${{ github.head_ref }}
+        if [[ $BRANCH_NAME == feature/* ]]; then
+          echo "Adding label: feature"
+          echo "::set-output name=label::feature"
+        elif [[ $BRANCH_NAME == bug/* ]]; then
+          echo "Adding label: bug"
+          echo "::set-output name=label::bug"
+        elif [[ $BRANCH_NAME == documentation/* ]]; then
+          echo "Adding label: documentation"
+          echo "::set-output name=label::documentation"
+        elif [[ $BRANCH_NAME == enhancement/* ]]; then
+          echo "Adding label: enhancement"
+          echo "::set-output name=label::enhancement"
+        elif [[ $BRANCH_NAME == fix/* ]]; then
+          echo "Adding label: fix"
+          echo "::set-output name=label::fix"
+        # Add more conditions here for other branch naming conventions if needed
+        fi
+      id: branch_check
+
+    - name: Apply label to PR
+      uses: actions/github-script@v3
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const { issue } = context;
+          const label = "${{ steps.branch_check.outputs.label }}";
+          if (label) {
+            github.issues.addLabels({
+              issue_number: issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: [label]
+            });
+          }

@@ -10,16 +10,26 @@ import {
   createActivityWithAssignment,
   getActivitiesByClassId,
   updateStudentGrades,
+  createAiActivity,
+  getStudentActivityById,
+  getActivityStudentsByActivityId,
+  getActivitiesByProfessor,
 } from "../controllers/activity.controller"; 
 
 const router = Router();
 
 // Get All activities
 router.get("/", getActivities);
-
+//Get activity students
+router.get("/activityStudents/:activityId", getActivityStudentsByActivityId);
+// Get an activity by its ID
+router.get("/studentActivity/:activityId/:classId", getStudentActivityById);
 // Obtain activity by id
-router.get("/:id", getActivityById);
+router.get("/activity/:id/:professorEmail", getActivityById);
 
+router.get("/c/activitiesByProfessor/:professorEmail", getActivitiesByProfessor);
+// Create an activity with gpt model
+router.post("/Davinci", createAiActivity);
 // Create an activity
 router.post(
   "/",
@@ -44,7 +54,7 @@ router.put(
 );
 router.get("/ClassId/:id", getActivitiesByClassId);
 //update grade
-router.post("/ActivityStudent", updateStudentGrades);
+router.post("/ActivityStudent/:activityStudentId", updateStudentGrades);
 // Delete an activity
 router.delete("/:id", deleteActivity);
 

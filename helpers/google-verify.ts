@@ -9,7 +9,7 @@ export async function googleVerify(token: string): Promise<{ name?: string; fami
   });
 
   const payload = ticket.getPayload();
-  const { name, family_name, email } = payload || {}; // Usar desestructuración con un objeto vacío por defecto
+  const { name, family_name, email } = payload || {}; // deconstructing the payload
 
   return { name, family_name, email };
 }

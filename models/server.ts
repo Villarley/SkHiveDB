@@ -1,11 +1,17 @@
 import express, {Application} from 'express';
+//connection
+import db from '../db/connection';
 import cors from 'cors';
 //Routes:
 import userRoutes from '../routes/person.routes';
+import  authRoutes  from "../routes/auth.routes";
 import classRoutes from "../routes/class.routes"
 import activyRoutes from "../routes/activities.routes";
-import  authRoutes  from "../routes/auth.routes";
-import db from '../db/connection';
+import notificationRoutes from "../routes/notifications.routes"
+import remindersRoutes from "../routes/reminders.routes"
+//initializations:
+import { configureAssociations, initializeModels } from './Classroom/associations';
+import "../config/firebaseConfig";
 
 class Server{
     private app: Application;
@@ -17,6 +23,8 @@ class Server{
         person: '/api/person/',
         classes:'/api/classes/',
         activities:'/api/activities/',
+        notifications:'/api/notifications/',
+        reminders:'/api/reminders/',
     }
     constructor(){
         this.app = express();
@@ -32,7 +40,10 @@ class Server{
             //verify connection
             await db.authenticate();
             //sync the models
+            await initializeModels();
+            await configureAssociations();
             await db.sync({force: true});
+            //Configuring associations
             console.log('DB online')
         }catch(error){
             throw error;
@@ -54,6 +65,8 @@ class Server{
         this.app.use( this.apiPaths.person, userRoutes );
         this.app.use( this.apiPaths.classes, classRoutes ); 
         this.app.use( this.apiPaths.activities, activyRoutes ); 
+        this.app.use( this.apiPaths.notifications, notificationRoutes); 
+        this.app.use( this.apiPaths.reminders, remindersRoutes); 
 
     }
 
